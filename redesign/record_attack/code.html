@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Record Attack Modal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#fb7e51",
+                        "primary-light": "#fff0ea",
+                        "background-light": "#fcfbfa",
+                        "surface-light": "#ffffff",
+                        "text-main": "#2d2420",
+                        "text-sub": "#6b625e",
+                        "soft-gray": "#f3f0ef",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "2.5rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        "soft": "0 10px 40px -10px rgba(45, 36, 32, 0.08)",
+                        "button": "0 10px 20px -5px rgba(251, 126, 81, 0.3)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }.radio-input:checked + span {
+        background-color: #fff0ea;color: #fb7e51;border: 1px solid #fb7e51;
+        box-shadow: 0 4px 12px -2px rgba(251, 126, 81, 0.15);
+    }
+    .radio-input:not(:checked) + span {
+        background-color: transparent;
+        color: #6b625e;
+        border: 1px solid transparent;
+    }
+</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light font-display text-text-main min-h-screen antialiased">
+<div class="relative flex h-screen w-full flex-col overflow-hidden bg-background-light">
+<div class="absolute inset-0 z-0 p-6 flex flex-col gap-6 opacity-30 pointer-events-none filter blur-[2px]">
+<div class="flex justify-between items-center">
+<div>
+<p class="text-sm text-primary font-bold uppercase tracking-wider">Good Morning</p>
+<h2 class="text-3xl font-extrabold text-text-main">Whiskers</h2>
+</div>
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20 shadow-sm">
+<img alt="Cat profile" class="object-cover h-full w-full" data-alt="Close up photo of a tabby cat face" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgmzCnoRpRDspXd4VUWvwRLazrUd9-Jnxx8KOjjpJcAA4rhrnfkayg92mPXQKwVguiS4LBcBYV0j4PosXj7fbi9sL5GBclZUFWdd0WQWUXHcmLktWxEGVkn0R-BDS7XRAfNUIEYBsIhDN9OWE1tvwwBhof1HV3Lzal_GDoGHK5AE_89Rh_FimeINc_kgxub-TbyejzRVSlWWbI1Nd6BVmZg4SJzqZB6Jb5sl0rmByAJjpvANrbvqcyeZ66jux9D0KxCa2jmEZAt8k"/>
+</div>
+</div>
+<div class="bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
+<p class="text-sm font-semibold text-text-sub">Next Dose</p>
+<h3 class="text-xl font-bold text-text-main">10:30 AM · Inhaler</h3>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white p-4 rounded-xl h-32 border border-gray-100"></div>
+<div class="bg-white p-4 rounded-xl h-32 border border-gray-100"></div>
+</div>
+</div>
+<div class="absolute inset-0 z-10 flex flex-col justify-end bg-black/20 backdrop-blur-[2px]">
+<div class="flex flex-col bg-surface-light rounded-t-[2.5rem] shadow-2xl max-h-[92vh] w-full">
+<div class="flex h-8 w-full items-center justify-center pt-5 pb-2">
+<div class="h-1.5 w-12 rounded-full bg-gray-200"></div>
+</div>
+<div class="px-8 pb-10 pt-2 overflow-y-auto">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h1 class="text-2xl font-extrabold text-text-main tracking-tight">Record Attack</h1>
+<p class="text-sm text-text-sub font-medium mt-1">Log symptoms for tracking</p>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-soft-gray text-text-sub hover:bg-gray-200 transition-colors">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+<div class="space-y-4 mb-8">
+<div class="flex items-center gap-2">
+<div class="bg-primary-light p-1.5 rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1">warning</span>
+</div>
+<h3 class="text-lg font-bold text-text-main">Severity</h3>
+</div>
+<div class="flex p-1.5 bg-soft-gray rounded-[1.5rem]">
+<label class="flex-1 cursor-pointer">
+<input checked="" class="radio-input hidden" name="severity" type="radio" value="Mild"/>
+<span class="flex h-12 w-full items-center justify-center rounded-[1.2rem] text-sm font-bold transition-all duration-200">
+                                Mild
+                            </span>
+</label>
+<label class="flex-1 cursor-pointer">
+<input class="radio-input hidden" name="severity" type="radio" value="Moderate"/>
+<span class="flex h-12 w-full items-center justify-center rounded-[1.2rem] text-sm font-bold transition-all duration-200">
+                                Moderate
+                            </span>
+</label>
+<label class="flex-1 cursor-pointer">
+<input class="radio-input hidden" name="severity" type="radio" value="Severe"/>
+<span class="flex h-12 w-full items-center justify-center rounded-[1.2rem] text-sm font-bold transition-all duration-200">
+                                Severe
+                            </span>
+</label>
+</div>
+</div>
+<div class="space-y-4 mb-8">
+<div class="flex items-center gap-2">
+<div class="bg-primary-light p-1.5 rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1">schedule</span>
+</div>
+<h3 class="text-lg font-bold text-text-main">Duration (min)</h3>
+</div>
+<div class="flex items-center justify-between bg-white p-2 rounded-2xl border border-gray-100 shadow-soft">
+<button class="w-14 h-14 rounded-xl bg-soft-gray text-text-sub flex items-center justify-center hover:bg-gray-200 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-2xl">remove</span>
+</button>
+<div class="flex flex-col items-center">
+<div class="text-4xl font-extrabold tabular-nums text-text-main tracking-tight">05</div>
+</div>
+<button class="w-14 h-14 rounded-xl bg-primary text-white flex items-center justify-center shadow-button active:scale-95 transition-all hover:bg-[#e06b40]">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+</div>
+</div>
+<div class="space-y-4 mb-10">
+<div class="flex items-center gap-2">
+<div class="bg-primary-light p-1.5 rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1">notes</span>
+</div>
+<h3 class="text-lg font-bold text-text-main">Observation Notes</h3>
+</div>
+<textarea class="w-full bg-soft-gray border-none rounded-2xl p-5 text-text-main placeholder:text-text-sub/60 focus:ring-2 focus:ring-primary focus:bg-white transition-all min-h-[120px] resize-none text-base" placeholder="Add details about triggers or behavior..."></textarea>
+</div>
+<button class="w-full bg-primary hover:bg-[#e06b40] text-white font-bold text-lg py-5 rounded-2xl shadow-button flex items-center justify-center gap-3 transition-all active:scale-[0.99]">
+<span class="material-symbols-outlined">check_circle</span>
+                        Save Record
+                    </button>
+<div class="h-8"></div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

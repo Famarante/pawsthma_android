@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pawsthma Home Dashboard Light</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "paw-coral": "#FF6B6B",
+                        "paw-coral-light": "#FFF0F0",
+                        "paw-mint": "#4ECDC4",
+                        "paw-mint-light": "#E0F7F6",
+                        "paw-yellow": "#FFD93D",
+                        "background-light": "#F9F9F9",
+                        "charcoal": "#2D3436",
+                        "charcoal-light": "#636E72",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "1.5rem",
+                        "xl": "2rem",
+                        "2xl": "2.5rem",
+                        "3xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            min-height: max(800px, 100dvh);
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light font-display text-charcoal min-h-screen selection:bg-paw-mint selection:text-white">
+<div class="relative flex h-full min-h-screen w-full flex-col max-w-md mx-auto bg-white shadow-2xl overflow-hidden pb-20">
+<div class="px-6 pt-12 pb-4 flex justify-between items-center">
+<div class="flex items-center gap-3 bg-gray-50 border border-gray-100 pr-4 pl-1 py-1 rounded-full cursor-pointer hover:bg-gray-100 transition-colors">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm relative">
+<img alt="Cat profile" class="object-cover w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgmzCnoRpRDspXd4VUWvwRLazrUd9-Jnxx8KOjjpJcAA4rhrnfkayg92mPXQKwVguiS4LBcBYV0j4PosXj7fbi9sL5GBclZUFWdd0WQWUXHcmLktWxEGVkn0R-BDS7XRAfNUIEYBsIhDN9OWE1tvwwBhof1HV3Lzal_GDoGHK5AE_89Rh_FimeINc_kgxub-TbyejzRVSlWWbI1Nd6BVmZg4SJzqZB6Jb5sl0rmByAJjpvANrbvqcyeZ66jux9D0KxCa2jmEZAt8k"/>
+</div>
+<div>
+<h2 class="text-sm font-bold text-charcoal leading-tight">Whiskers</h2>
+<p class="text-[10px] font-semibold text-charcoal-light uppercase tracking-wider">Active Profile</p>
+</div>
+<span class="material-symbols-outlined text-charcoal-light text-lg">expand_more</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 text-charcoal-light hover:bg-gray-100 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto px-6 pb-24">
+<div class="mt-4 bg-paw-mint-light border border-paw-mint/20 rounded-3xl p-6 relative overflow-hidden">
+<div class="absolute -right-10 -top-10 w-40 h-40 bg-paw-mint/10 rounded-full blur-2xl pointer-events-none"></div>
+<div class="flex items-center justify-between relative z-10">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="w-2 h-2 rounded-full bg-paw-mint"></span>
+<p class="text-xs font-bold text-paw-mint uppercase tracking-wide">Maintenance</p>
+</div>
+<h3 class="text-xl font-extrabold text-charcoal mb-1">Next Inhaler<br/>Cleaning</h3>
+<p class="text-sm text-charcoal-light font-medium">Due in 2 days</p>
+</div>
+<div class="relative w-20 h-20 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-white/50" cx="40" cy="40" fill="transparent" r="32" stroke="currentColor" stroke-width="6"></circle>
+<circle class="text-paw-mint" cx="40" cy="40" fill="transparent" r="32" stroke="currentColor" stroke-dasharray="200" stroke-dashoffset="60" stroke-linecap="round" stroke-width="6"></circle>
+</svg>
+<span class="absolute text-sm font-bold text-paw-mint">70%</span>
+</div>
+</div>
+</div>
+<div class="mt-8 grid grid-cols-2 gap-4">
+<button class="flex flex-col items-center justify-center gap-3 h-40 rounded-3xl bg-paw-coral-light border border-paw-coral/10 hover:bg-red-50 transition-all active:scale-95 group">
+<div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-paw-coral group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1">emergency</span>
+</div>
+<span class="font-bold text-paw-coral text-lg">+ Record Attack</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-3 h-40 rounded-3xl bg-paw-mint-light border border-paw-mint/10 hover:bg-teal-50 transition-all active:scale-95 group">
+<div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-paw-mint group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1">medication</span>
+</div>
+<span class="font-bold text-paw-mint text-lg">+ Log Inhaler</span>
+</button>
+</div>
+<div class="mt-10">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-bold text-charcoal">Weekly Activity</h3>
+<button class="text-xs font-bold text-charcoal-light bg-gray-100 px-3 py-1.5 rounded-full hover:bg-gray-200 transition-colors">Last 7 Days</button>
+</div>
+<div class="h-48 flex items-end justify-between gap-2 px-2">
+<div class="flex flex-col items-center gap-2 w-full group cursor-pointer">
+<div class="w-full flex flex-col-reverse items-center gap-1 h-32 relative">
+<div class="w-full max-w-[12px] h-[30%] bg-paw-mint rounded-full opacity-80 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-full max-w-[12px] h-[10%] bg-paw-coral rounded-full opacity-80 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<span class="text-xs font-semibold text-charcoal-light">Mon</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group cursor-pointer">
+<div class="w-full flex flex-col-reverse items-center gap-1 h-32 relative">
+<div class="w-full max-w-[12px] h-[45%] bg-paw-mint rounded-full opacity-80 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<span class="text-xs font-semibold text-charcoal-light">Tue</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group cursor-pointer">
+<div class="w-full flex flex-col-reverse items-center gap-1 h-32 relative">
+<div class="w-full max-w-[12px] h-[40%] bg-paw-mint rounded-full opacity-80 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-full max-w-[12px] h-[25%] bg-paw-coral rounded-full opacity-80 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<span class="text-xs font-semibold text-charcoal-light">Wed</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group cursor-pointer">
+<div class="w-full flex flex-col-reverse items-center gap-1 h-32 relative">
+<div class="w-full max-w-[12px] h-[60%] bg-paw-mint rounded-full opacity-80 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<span class="text-xs font-semibold text-charcoal-light">Thu</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group cursor-pointer">
+<div class="w-full flex flex-col-reverse items-center gap-1 h-32 relative">
+<div class="w-full max-w-[12px] h-[20%] bg-paw-mint rounded-full opacity-80 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<span class="text-xs font-semibold text-charcoal-light">Fri</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group cursor-pointer">
+<div class="w-full flex flex-col-reverse items-center gap-1 h-32 relative">
+<div class="w-full max-w-[12px] h-[50%] bg-paw-mint rounded-full opacity-80 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-full max-w-[12px] h-[40%] bg-paw-coral rounded-full opacity-80 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<span class="text-xs font-semibold text-charcoal-light">Sat</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group cursor-pointer">
+<div class="w-full flex flex-col-reverse items-center gap-1 h-32 relative">
+<div class="w-full max-w-[12px] h-[35%] bg-paw-mint rounded-full opacity-80 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<span class="text-xs font-semibold text-charcoal-light">Sun</span>
+</div>
+</div>
+</div>
+<div class="mt-10 mb-6">
+<h3 class="text-lg font-bold text-charcoal mb-4">Today</h3>
+<div class="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-paw-mint/10 flex items-center justify-center text-paw-mint">
+<span class="material-symbols-outlined text-xl">medication</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-charcoal text-sm">Morning Puff</h4>
+<p class="text-xs text-charcoal-light">Flovent · 110mcg</p>
+</div>
+<span class="text-xs font-bold text-charcoal-light bg-gray-50 px-2 py-1 rounded-md">8:30 AM</span>
+</div>
+</div>
+</div>
+<div class="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-100 px-6 py-4 flex justify-between items-center z-20">
+<button class="flex flex-col items-center gap-1 text-paw-mint w-16">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-charcoal-light w-16 hover:text-charcoal transition-colors">
+<span class="material-symbols-outlined">insights</span>
+<span class="text-[10px] font-bold">Trends</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-charcoal-light w-16 hover:text-charcoal transition-colors">
+<span class="material-symbols-outlined">pets</span>
+<span class="text-[10px] font-bold">Profile</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-charcoal-light w-16 hover:text-charcoal transition-colors">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-bold">Settings</span>
+</button>
+</div>
+</div>
+
+</body></html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pawsthma Cat Profile Light</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "golden-yellow": "#FBBF24", 
+                        "charcoal": "#334155",
+                        "mint-light": "#E0F2F1",
+                        "mint-text": "#00695C",
+                        "border-light": "#E2E8F0",
+                        "background-light": "#FAFAFA",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {height: 100vh;
+            overflow: hidden;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light font-display text-slate-800 antialiased flex flex-col h-full">
+<header class="flex items-center justify-between px-6 pt-12 pb-4 bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-gray-100">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-600 transition-colors">
+<span class="material-symbols-outlined text-[28px]">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold text-charcoal">Profile</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-600 transition-colors">
+<span class="material-symbols-outlined text-[28px]">settings</span>
+</button>
+</header>
+<main class="flex-1 overflow-y-auto px-6 pb-24">
+<div class="flex flex-col items-center mt-8 mb-8">
+<div class="relative">
+<div class="w-32 h-32 rounded-full overflow-hidden border-4 border-golden-yellow shadow-sm">
+<img alt="Cat profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgmzCnoRpRDspXd4VUWvwRLazrUd9-Jnxx8KOjjpJcAA4rhrnfkayg92mPXQKwVguiS4LBcBYV0j4PosXj7fbi9sL5GBclZUFWdd0WQWUXHcmLktWxEGVkn0R-BDS7XRAfNUIEYBsIhDN9OWE1tvwwBhof1HV3Lzal_GDoGHK5AE_89Rh_FimeINc_kgxub-TbyejzRVSlWWbI1Nd6BVmZg4SJzqZB6Jb5sl0rmByAJjpvANrbvqcyeZ66jux9D0KxCa2jmEZAt8k"/>
+</div>
+<div class="absolute bottom-1 right-1 bg-white p-1.5 rounded-full shadow-md border border-gray-100">
+<span class="material-symbols-outlined text-golden-yellow text-sm font-bold block">edit</span>
+</div>
+</div>
+<h2 class="text-3xl font-extrabold text-charcoal mt-4">Whiskers</h2>
+<p class="text-slate-500 font-medium">Tabby Shorthair · 4 Years Old</p>
+</div>
+<div class="flex justify-center gap-3 mb-10 flex-wrap">
+<div class="px-4 py-2 bg-mint-light rounded-full flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-mint-text text-lg">monitor_weight</span>
+<span class="text-mint-text font-bold text-sm">4.5 kg</span>
+</div>
+<div class="px-4 py-2 bg-mint-light rounded-full flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-mint-text text-lg" style="font-variation-settings: 'FILL' 1">female</span>
+<span class="text-mint-text font-bold text-sm">Female</span>
+</div>
+<div class="px-4 py-2 bg-mint-light rounded-full flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-mint-text text-lg">cake</span>
+<span class="text-mint-text font-bold text-sm">May 12</span>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Veterinarian</h3>
+<div class="border border-border-light rounded-xl p-5 flex items-start gap-4 hover:border-golden-yellow/50 transition-colors">
+<div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-slate-400 border border-gray-100 shrink-0">
+<span class="material-symbols-outlined">medical_services</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-charcoal text-lg">Dr. Sarah Miller</h4>
+<p class="text-slate-500 text-sm mb-1">Paws &amp; Claws Clinic</p>
+<p class="text-slate-400 text-xs">555-0123 · 123 Pet Lane</p>
+</div>
+<button class="w-10 h-10 rounded-full border border-border-light flex items-center justify-center text-golden-yellow hover:bg-golden-yellow hover:text-white transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">call</span>
+</button>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Current Medications</h3>
+<div class="border border-border-light rounded-xl p-0 overflow-hidden">
+<div class="p-5 border-b border-border-light flex items-center gap-4">
+<div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-400 border border-blue-100 shrink-0">
+<span class="material-symbols-outlined">medication</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-charcoal">Flixotide Inhaler</h4>
+<p class="text-slate-500 text-sm">1 puff, twice daily</p>
+</div>
+</div>
+<div class="p-5 flex items-center gap-4">
+<div class="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center text-purple-400 border border-purple-100 shrink-0">
+<span class="material-symbols-outlined">pill</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-charcoal">Prednisolone</h4>
+<p class="text-slate-500 text-sm">5mg, as needed</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Diagnosis</h3>
+<div class="border border-border-light rounded-xl p-5">
+<p class="text-charcoal font-medium">Feline Asthma</p>
+<p class="text-slate-500 text-sm mt-1">Diagnosed June 2023 via X-ray.</p>
+</div>
+</div>
+</main>
+<div class="absolute bottom-0 left-0 w-full px-6 pt-4 pb-8 bg-gradient-to-t from-white via-white to-transparent">
+<button class="w-full bg-golden-yellow hover:bg-yellow-400 text-white font-extrabold text-lg py-4 rounded-xl shadow-[0_4px_14px_rgba(251,191,36,0.4)] flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined">edit_square</span>
+            Edit Profile
+        </button>
+</div>
+
+</body></html>
