@@ -1,4 +1,4 @@
-import { Cat, Household, InhalerInfo, Profile } from '../types';
+import { Attack, Cat, Household, InhalerInfo, Profile } from '../types';
 import { EMOJIS, PCOLS } from '../constants/colors';
 
 const DEFAULT_INHALER_INFO: InhalerInfo = {
@@ -177,6 +177,38 @@ export const buildWeeklyData = (attacks: Attack[], lang: string): WeekBucket[] =
     m[w][a.severity]++;
   });
   return Object.values(m).slice(-6);
+};
+
+// ─── Attack grouping ────────────────────────────────────────────────────────
+
+export interface AttackGroup {
+  label: string;
+  dateKey: string;
+  items: Attack[];
+}
+
+export const groupAttacksByDate = (attacks: Attack[], lang: string): AttackGroup[] => {
+  const todayKey = today();
+  const yesterdayDate = new Date();
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterdayKey = fmtLocalDateKey(yesterdayDate);
+
+  const groups: Record<string, Attack[]> = {};
+  const sorted = [...attacks].sort((a, b) => b.date.localeCompare(a.date));
+
+  sorted.forEach((a) => {
+    const dateKey = a.date.split('T')[0];
+    if (!groups[dateKey]) groups[dateKey] = [];
+    groups[dateKey].push(a);
+  });
+
+  return Object.entries(groups).map(([dateKey, items]) => {
+    let label: string;
+    if (dateKey === todayKey) label = 'Today';
+    else if (dateKey === yesterdayKey) label = 'Yesterday';
+    else label = fmt(dateKey, lang);
+    return { label, dateKey, items };
+  });
 };
 
 // ─── Misc ────────────────────────────────────────────────────────────────────

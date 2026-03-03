@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import {
   AppData,
   AttackForm,
+  Cat,
   Household,
   InhalerForm,
   InhalerInfo,
@@ -42,6 +43,7 @@ interface AppState {
   // UI state
   modal: ModalType;
   showMgr: boolean;
+  showCatSwitcher: boolean;
   catId: string | null;
 
   // Form state
@@ -61,6 +63,7 @@ interface AppState {
   setCatId: (id: string | null) => void;
   setModal: (modal: ModalType) => void;
   setShowMgr: (show: boolean) => void;
+  setShowCatSwitcher: (show: boolean) => void;
   setAttackForm: (f: Partial<AttackForm>) => void;
   setInhalerForm: (f: Partial<InhalerForm>) => void;
   setInhalerInfoForm: (f: Partial<InhalerInfo>) => void;
@@ -82,6 +85,7 @@ interface AppState {
   deleteInhaler: (id: number, homeKey: string, catId: string, uid: string | null) => Promise<void>;
   saveInhalerInfo: (homeKey: string, catId: string, uid: string | null) => Promise<void>;
   saveProfiles: (profiles: Profile[], homeKey: string, uid: string | null) => Promise<void>;
+  saveCatInfo: (catInfo: Partial<Cat>, homeKey: string, catId: string, uid: string | null) => Promise<void>;
   addCat: (name: string, homeKey: string, uid: string | null) => Promise<string>;
 
   handleHouseholdAction: (
@@ -128,6 +132,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   syncSecs: 0,
   modal: null,
   showMgr: false,
+  showCatSwitcher: false,
   catId: null,
   attackForm: { ...DEFAULT_ATTACK_FORM },
   inhalerForm: { ...DEFAULT_INHALER_FORM },
@@ -142,6 +147,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   setCatId: (catId) => set({ catId }),
   setModal: (modal) => set({ modal }),
   setShowMgr: (showMgr) => set({ showMgr }),
+  setShowCatSwitcher: (showCatSwitcher) => set({ showCatSwitcher }),
   setAttackForm: (f) => set((s) => ({ attackForm: { ...s.attackForm, ...f } })),
   setInhalerForm: (f) => set((s) => ({ inhalerForm: { ...s.inhalerForm, ...f } })),
   setInhalerInfoForm: (f) => set((s) => ({ inhalerInfoForm: { ...s.inhalerInfoForm, ...f } })),
@@ -443,6 +449,26 @@ export const useAppStore = create<AppState>((set, get) => ({
       uid,
     );
     set({ showMgr: false });
+  },
+
+  saveCatInfo: async (catInfo, homeKey, catId, uid) => {
+    const { doSave } = get();
+    await doSave(
+      (d) => ({
+        ...d,
+        households: {
+          ...d.households,
+          [homeKey]: {
+            ...d.households[homeKey],
+            cats: d.households[homeKey].cats.map((c) =>
+              c.id === catId ? { ...c, ...catInfo } : c,
+            ),
+          },
+        },
+      }),
+      homeKey,
+      uid,
+    );
   },
 
   addCat: async (name, homeKey, uid) => {

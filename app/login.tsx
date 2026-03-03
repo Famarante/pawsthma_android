@@ -6,13 +6,15 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  Alert,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../stores/authStore';
 import { useAppStore, HouseholdActionResult } from '../stores/appStore';
-import { G } from '../constants/colors';
+import { G, SHADOWS, GRADIENTS } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 import { LangToggle } from '../components/LangToggle';
 
 type Mode = 'open' | 'create' | 'join';
@@ -89,149 +91,191 @@ export default function LoginScreen() {
     router.replace('/');
   };
 
-  return (
-    <ScrollView style={styles.bg} contentContainerStyle={styles.container}>
-      <LangToggle lang={lang} setLang={setLang} />
-      <View style={styles.card}>
-        <Text style={styles.icon}>🔐</Text>
-        <Text style={styles.title}>{t('loginEnter')}</Text>
-        {user?.email && (
-          <Text style={styles.sub}>{t('signedInAs', { u: user.email })}</Text>
-        )}
-        <Text style={styles.sub}>{t('loginSub')}</Text>
+  const tabs: { key: Mode; label: string }[] = [
+    ...(hasSaved ? [{ key: 'open' as Mode, label: t('chooseHousehold') }] : []),
+    { key: 'create', label: t('addHousehold') },
+    { key: 'join', label: t('joinWithInvite') },
+  ];
 
-        {/* Mode tabs */}
-        <View style={styles.tabs}>
-          {hasSaved && (
-            <TouchableOpacity
-              style={[styles.tab, mode === 'open' && styles.tabActive]}
-              onPress={() => { setMode('open'); setErr(null); }}
-            >
-              <Text style={[styles.tabText, mode === 'open' && styles.tabTextActive]}>
-                {t('chooseHousehold')}
-              </Text>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity
-            style={[styles.tab, mode === 'create' && styles.tabActive]}
-            onPress={() => { setMode('create'); setErr(null); }}
-          >
-            <Text style={[styles.tabText, mode === 'create' && styles.tabTextActive]}>
-              {t('addHousehold')}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, mode === 'join' && styles.tabActive]}
-            onPress={() => { setMode('join'); setErr(null); }}
-          >
-            <Text style={[styles.tabText, mode === 'join' && styles.tabTextActive]}>
-              {t('joinWithInvite')}
-            </Text>
-          </TouchableOpacity>
+  return (
+    <LinearGradient colors={GRADIENTS.bgSplash} style={styles.bg}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.langRow}>
+          <LangToggle lang={lang} setLang={setLang} compact />
         </View>
 
-        {/* Open */}
-        {mode === 'open' && hasSaved && (
-          <View style={{ marginBottom: 12 }}>
-            {options.map((o) => (
+        <View style={styles.logoMoment}>
+          <View style={[styles.logoCircle, SHADOWS.primary]}>
+            <MaterialIcons name="pets" size={28} color={G.primary} />
+          </View>
+          <Text style={styles.wordmark}>Pawsthma</Text>
+          <Text style={styles.tagline}>{t('sub')}</Text>
+        </View>
+
+        <View style={[styles.card, SHADOWS.card]}>
+          <Text style={styles.title}>{t('loginEnter')}</Text>
+          {user?.email && (
+            <Text style={styles.sub}>{t('signedInAs', { u: user.email })}</Text>
+          )}
+          <Text style={styles.sub}>{t('loginSub')}</Text>
+
+          <View style={styles.segControl}>
+            {tabs.map(({ key, label }) => (
               <TouchableOpacity
-                key={o.id}
-                style={[styles.homeRow, selectedId === o.id && styles.homeRowActive]}
-                onPress={() => { setSelectedId(o.id); setErr(null); }}
+                key={key}
+                style={[styles.segTab, mode === key && styles.segTabActive]}
+                onPress={() => { setMode(key); setErr(null); }}
               >
-                <Text style={[styles.homeLabel, selectedId === o.id && styles.homeLabelActive]}>
-                  🏠 {o.label}
+                <Text style={[styles.segTabText, mode === key && styles.segTabTextActive]}>
+                  {label}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
-        )}
 
-        {/* Create */}
-        {mode === 'create' && (
-          <TextInput
-            style={[styles.input, { marginBottom: 12 }]}
-            value={householdName}
-            onChangeText={(v) => { setHouseholdName(v); setErr(null); }}
-            placeholder={t('householdName')}
-            placeholderTextColor={G.muted}
-          />
-        )}
+          {mode === 'open' && hasSaved && (
+            <View style={{ marginBottom: 12 }}>
+              {options.map((o) => (
+                <TouchableOpacity
+                  key={o.id}
+                  style={[styles.homeRow, selectedId === o.id && styles.homeRowActive]}
+                  onPress={() => { setSelectedId(o.id); setErr(null); }}
+                >
+                  <MaterialIcons
+                    name="home"
+                    size={18}
+                    color={selectedId === o.id ? G.primary : G.muted}
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text style={[styles.homeLabel, selectedId === o.id && styles.homeLabelActive]}>
+                    {o.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
 
-        {/* Join */}
-        {mode === 'join' && (
-          <TextInput
-            style={[styles.input, { marginBottom: 12 }]}
-            value={inviteCode}
-            onChangeText={(v) => { setInviteCode(v); setErr(null); }}
-            placeholder={t('inviteHint')}
-            placeholderTextColor={G.muted}
-            autoCapitalize="characters"
-          />
-        )}
+          {mode === 'create' && (
+            <TextInput
+              style={[styles.input, { marginBottom: 12 }]}
+              value={householdName}
+              onChangeText={(v) => { setHouseholdName(v); setErr(null); }}
+              placeholder={t('householdName')}
+              placeholderTextColor={G.muted}
+            />
+          )}
 
-        {err && <Text style={styles.err}>{err}</Text>}
+          {mode === 'join' && (
+            <TextInput
+              style={[styles.input, { marginBottom: 12 }]}
+              value={inviteCode}
+              onChangeText={(v) => { setInviteCode(v); setErr(null); }}
+              placeholder={t('inviteHint')}
+              placeholderTextColor={G.muted}
+              autoCapitalize="characters"
+            />
+          )}
 
-        <TouchableOpacity style={styles.btn} onPress={submit}>
-          <Text style={styles.btnText}>
-            {mode === 'join' ? t('joinWithInvite') : mode === 'create' ? t('loginCreate') : t('login')}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+          {err && <Text style={styles.err}>{err}</Text>}
+
+          <TouchableOpacity style={[styles.btn, SHADOWS.primary]} onPress={submit}>
+            <Text style={styles.btnText}>
+              {mode === 'join' ? t('joinWithInvite') : mode === 'create' ? t('loginCreate') : t('login')}
+            </Text>
+            <MaterialIcons name="arrow-forward" size={18} color="#FFF" />
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  bg: { flex: 1, backgroundColor: G.bg },
+  bg: { flex: 1 },
   container: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', padding: 16 },
+  langRow: { position: 'absolute', top: 52, right: 16 },
+  logoMoment: { alignItems: 'center', marginBottom: 20 },
+  logoCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  wordmark: {
+    color: G.text,
+    fontSize: 22,
+    fontFamily: FONTS.extraBold,
+    letterSpacing: -0.5,
+    marginBottom: 4,
+  },
+  tagline: { color: G.muted, fontSize: 13, fontFamily: FONTS.regular },
   card: {
     width: '100%',
     maxWidth: 400,
-    backgroundColor: G.surface,
-    borderWidth: 1,
-    borderColor: G.border,
-    borderRadius: 22,
-    padding: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 24,
   },
-  icon: { fontSize: 36, textAlign: 'center', marginBottom: 8 },
-  title: { color: G.text, fontSize: 24, fontWeight: '700', textAlign: 'center', marginBottom: 4 },
-  sub: { color: G.muted, fontSize: 12, textAlign: 'center', marginBottom: 8 },
-  tabs: { flexDirection: 'row', gap: 6, marginBottom: 12 },
-  tab: {
+  title: { color: G.text, fontSize: 20, fontFamily: FONTS.bold, textAlign: 'center', marginBottom: 4 },
+  sub: { color: G.muted, fontSize: 12, fontFamily: FONTS.regular, textAlign: 'center', marginBottom: 8 },
+  segControl: {
+    flexDirection: 'row',
+    backgroundColor: G.surface,
+    borderRadius: 14,
+    padding: 4,
+    marginBottom: 12,
+    gap: 2,
+  },
+  segTab: {
     flex: 1,
-    padding: 8,
+    paddingVertical: 8,
     borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.05)',
     alignItems: 'center',
   },
-  tabActive: { backgroundColor: `${G.amber}33` },
-  tabText: { color: G.muted, fontSize: 11, textAlign: 'center' },
-  tabTextActive: { color: G.amber },
+  segTabActive: {
+    backgroundColor: G.primary,
+    ...SHADOWS.primary,
+  },
+  segTabText: { color: G.muted, fontSize: 11, fontFamily: FONTS.semiBold, textAlign: 'center' },
+  segTabTextActive: { color: '#FFFFFF', fontFamily: FONTS.bold },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: G.bgInput,
     borderWidth: 1,
     borderColor: G.border,
-    borderRadius: 12,
+    borderRadius: 14,
     color: G.text,
-    fontSize: 15,
-    padding: 12,
+    fontSize: 16,
+    fontFamily: FONTS.regular,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
   },
   homeRow: {
     width: '100%',
-    padding: '11px 12px' as any,
-    paddingVertical: 11,
-    paddingHorizontal: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
     marginBottom: 8,
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1.5,
     borderColor: G.border,
-    backgroundColor: 'transparent',
+    backgroundColor: G.bgInput,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  homeRowActive: { borderColor: G.amber, backgroundColor: `${G.amber}1f` },
-  homeLabel: { color: G.text, fontWeight: '600' },
-  homeLabelActive: { color: G.amber },
-  err: { color: G.coral, fontSize: 12, marginBottom: 12 },
-  btn: { backgroundColor: G.amber, borderRadius: 14, padding: 13, alignItems: 'center' },
-  btnText: { color: '#0a0f1e', fontWeight: '700', fontSize: 16 },
+  homeRowActive: { borderColor: G.primary, backgroundColor: 'rgba(255,126,103,0.06)' },
+  homeLabel: { color: G.text, fontFamily: FONTS.semiBold },
+  homeLabelActive: { color: G.primary },
+  err: { color: G.coral, fontSize: 12, fontFamily: FONTS.medium, marginBottom: 12 },
+  btn: {
+    backgroundColor: G.primary,
+    borderRadius: 16,
+    paddingVertical: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  btnText: { color: '#FFFFFF', fontFamily: FONTS.bold, fontSize: 16 },
 });

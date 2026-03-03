@@ -7,12 +7,15 @@ import {
   ScrollView,
   StyleSheet,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/authStore';
 import { useAppStore } from '../../stores/appStore';
 import { useHousehold } from '../../hooks/useHousehold';
-import { G } from '../../constants/colors';
+import { G, SHADOWS, GRADIENTS } from '../../constants/colors';
+import { FONTS } from '../../constants/fonts';
 import { LangToggle } from '../../components/LangToggle';
 
 export default function CatSetupScreen() {
@@ -44,158 +47,188 @@ export default function CatSetupScreen() {
   };
 
   if (!isFirstCat) {
-    // CatPicker mode
     return (
-      <ScrollView style={styles.bg} contentContainerStyle={styles.container}>
-        <LangToggle lang={lang} setLang={setLang} />
-        <Text style={styles.title}>{t('chooseCat')}</Text>
-        <Text style={styles.sub}>{t('catHistorySub')}</Text>
-
-        {cats.map((c, idx) => (
-          <TouchableOpacity key={c.id} style={styles.catRow} onPress={() => chooseCat(c.id)}>
-            <View style={styles.catLeft}>
-              <Text style={{ fontSize: 22 }}>🐱</Text>
-              <Text style={styles.catName}>{c.name || `Cat ${idx + 1}`}</Text>
-            </View>
-            <Text style={styles.catCount}>
-              {t('catCount', { count: (c.attacks || []).length })}
-            </Text>
-          </TouchableOpacity>
-        ))}
-
-        <View style={styles.addSection}>
-          <Text style={styles.addLabel}>{t('addNewCat')}</Text>
-          <View style={styles.addRow}>
-            <TextInput
-              style={styles.input}
-              value={name}
-              onChangeText={(v) => { setName(v); setErr(null); }}
-              placeholder={t('catName')}
-              placeholderTextColor={G.muted}
-            />
-            <TouchableOpacity
-              style={styles.addBtn}
-              onPress={async () => {
-                if (!name.trim() || !homeKey) return;
-                const id = await addCat(name.trim(), homeKey, uid);
-                setCatId(id);
-                setName('');
-                router.replace('/(tabs)');
-              }}
-            >
-              <Text style={styles.addBtnText}>{t('add')}</Text>
-            </TouchableOpacity>
+      <LinearGradient colors={GRADIENTS.bgSplash} style={styles.bg}>
+        <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.langRow}>
+            <LangToggle lang={lang} setLang={setLang} compact />
           </View>
-          {err && <Text style={styles.err}>{err}</Text>}
-        </View>
-      </ScrollView>
+          <Text style={styles.title}>{t('chooseCat')}</Text>
+          <Text style={styles.sub}>{t('catHistorySub')}</Text>
+
+          {cats.map((c, idx) => (
+            <TouchableOpacity key={c.id} style={[styles.catRow, SHADOWS.card]} onPress={() => chooseCat(c.id)}>
+              <View style={styles.catLeft}>
+                <View style={styles.catIcon}>
+                  <MaterialIcons name="pets" size={20} color={G.primary} />
+                </View>
+                <Text style={styles.catName}>{c.name || `Cat ${idx + 1}`}</Text>
+              </View>
+              <Text style={styles.catCount}>
+                {t('catCount', { count: (c.attacks || []).length })}
+              </Text>
+            </TouchableOpacity>
+          ))}
+
+          <View style={[styles.addSection, SHADOWS.card]}>
+            <Text style={styles.addLabel}>{t('addNewCat')}</Text>
+            <View style={styles.addRow}>
+              <TextInput
+                style={styles.input}
+                value={name}
+                onChangeText={(v) => { setName(v); setErr(null); }}
+                placeholder={t('catName')}
+                placeholderTextColor={G.muted}
+              />
+              <TouchableOpacity
+                style={[styles.addBtn, SHADOWS.mint]}
+                onPress={async () => {
+                  if (!name.trim() || !homeKey) return;
+                  const id = await addCat(name.trim(), homeKey, uid);
+                  setCatId(id);
+                  setName('');
+                  router.replace('/(tabs)');
+                }}
+              >
+                <Text style={styles.addBtnText}>{t('add')}</Text>
+              </TouchableOpacity>
+            </View>
+            {err && <Text style={styles.err}>{err}</Text>}
+          </View>
+        </ScrollView>
+      </LinearGradient>
     );
   }
 
   return (
-    <ScrollView style={styles.bg} contentContainerStyle={styles.container}>
-      <LangToggle lang={lang} setLang={setLang} />
-      <View style={styles.card}>
-        <Text style={styles.title}>{t('firstCatTitle')}</Text>
-        <Text style={styles.sub}>{t('firstCatSub')}</Text>
-        <TextInput
-          style={[styles.input, { marginBottom: 12 }]}
-          value={name}
-          onChangeText={(v) => { setName(v); setErr(null); }}
-          placeholder={t('catName')}
-          placeholderTextColor={G.muted}
-        />
-        {err && <Text style={styles.err}>{err}</Text>}
-        <TouchableOpacity style={styles.saveBtn} onPress={save}>
-          <Text style={styles.saveBtnText}>{t('saveCat')}</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+    <LinearGradient colors={GRADIENTS.bgSplash} style={styles.bg}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.langRow}>
+          <LangToggle lang={lang} setLang={setLang} compact />
+        </View>
+        <View style={[styles.card, SHADOWS.card]}>
+          <View style={styles.cardIcon}>
+            <MaterialIcons name="pets" size={32} color={G.primary} />
+          </View>
+          <Text style={styles.title}>{t('firstCatTitle')}</Text>
+          <Text style={styles.sub}>{t('firstCatSub')}</Text>
+          <TextInput
+            style={[styles.input, { marginBottom: 12 }]}
+            value={name}
+            onChangeText={(v) => { setName(v); setErr(null); }}
+            placeholder={t('catName')}
+            placeholderTextColor={G.muted}
+          />
+          {err && <Text style={styles.err}>{err}</Text>}
+          <TouchableOpacity style={[styles.saveBtn, SHADOWS.mint]} onPress={save}>
+            <Text style={styles.saveBtnText}>{t('saveCat')}</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  bg: { flex: 1, backgroundColor: G.bg },
+  bg: { flex: 1 },
   container: {
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
   },
+  langRow: { position: 'absolute', top: 52, right: 16 },
   card: {
     width: '100%',
     maxWidth: 420,
-    backgroundColor: G.surface,
-    borderWidth: 1,
-    borderColor: G.border,
-    borderRadius: 20,
-    padding: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 24,
+    alignItems: 'center',
+  },
+  cardIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255,126,103,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
   title: {
     color: G.text,
-    fontSize: 25,
-    fontWeight: '700',
+    fontSize: 24,
+    fontFamily: FONTS.extraBold,
     textAlign: 'center',
     marginBottom: 8,
   },
   sub: {
-    color: G.muted,
-    fontSize: 13,
+    color: G.sub,
+    fontSize: 14,
+    fontFamily: FONTS.regular,
     textAlign: 'center',
     marginBottom: 14,
+    lineHeight: 22,
   },
   catRow: {
     width: '100%',
     maxWidth: 430,
     marginBottom: 10,
-    padding: 14,
+    padding: 16,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: G.border,
-    backgroundColor: G.surface,
+    backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  catLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  catName: { color: G.text, fontWeight: '600' },
-  catCount: { color: G.muted, fontSize: 12 },
+  catLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  catIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,126,103,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  catName: { color: G.text, fontFamily: FONTS.semiBold, fontSize: 15 },
+  catCount: { color: G.sub, fontSize: 12, fontFamily: FONTS.regular },
   addSection: {
     width: '100%',
     maxWidth: 430,
     marginTop: 14,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: G.border,
+    padding: 16,
     borderRadius: 16,
-    backgroundColor: G.surface,
+    backgroundColor: '#FFFFFF',
   },
-  addLabel: { color: G.muted, fontSize: 12, marginBottom: 8 },
+  addLabel: { color: G.sub, fontSize: 13, fontFamily: FONTS.semiBold, marginBottom: 8 },
   addRow: { flexDirection: 'row', gap: 8 },
   input: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: G.bgInput,
     borderWidth: 1,
     borderColor: G.border,
-    borderRadius: 12,
+    borderRadius: 14,
     color: G.text,
-    fontSize: 15,
-    padding: 12,
+    fontSize: 16,
+    fontFamily: FONTS.regular,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
   },
   addBtn: {
-    paddingHorizontal: 12,
-    borderRadius: 12,
+    paddingHorizontal: 16,
+    borderRadius: 14,
     backgroundColor: G.mint,
     justifyContent: 'center',
+    paddingVertical: 14,
   },
-  addBtnText: { color: '#0a0f1e', fontWeight: '700' },
-  err: { color: G.coral, fontSize: 12, marginTop: 8 },
+  addBtnText: { color: '#FFFFFF', fontFamily: FONTS.bold },
+  err: { color: G.coral, fontSize: 12, fontFamily: FONTS.medium, marginTop: 8 },
   saveBtn: {
     width: '100%',
-    padding: 13,
-    borderRadius: 14,
+    paddingVertical: 15,
+    borderRadius: 16,
     backgroundColor: G.mint,
     alignItems: 'center',
   },
-  saveBtnText: { color: '#0a0f1e', fontWeight: '700', fontSize: 15 },
+  saveBtnText: { color: '#FFFFFF', fontFamily: FONTS.bold, fontSize: 16 },
 });

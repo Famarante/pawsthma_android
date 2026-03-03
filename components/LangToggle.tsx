@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { G } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 
 interface Props {
   lang: string;
@@ -36,19 +37,19 @@ export function LangToggle({ lang, setLang, compact }: Props) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    borderRadius: 20,
-    padding: 3,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 22,
+    padding: 4,
     gap: 2,
     alignSelf: 'center',
     marginBottom: 16,
   },
   btn: {
-    borderRadius: 16,
-    paddingVertical: 5,
-    paddingHorizontal: 9,
+    borderRadius: 18,
+    paddingVertical: 6,
+    paddingHorizontal: 11,
   },
-  btnActive: { backgroundColor: G.amber },
-  text: { color: G.muted, fontSize: 11, fontWeight: '700', textTransform: 'uppercase' },
-  textActive: { color: '#0a0f1e' },
+  btnActive: { backgroundColor: G.primary },
+  text: { color: G.muted, fontSize: 11, fontFamily: FONTS.bold },
+  textActive: { color: '#FFFFFF' },
 });

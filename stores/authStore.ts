@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { User } from 'firebase/auth';
 import {
   FB_ON,
+  fbAuthAvailable,
   fbAuthObserve,
   fbSignIn,
   fbSignOut,
@@ -66,6 +67,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setMetaReady: (metaReady) => set({ metaReady }),
 
   init: async () => {
+    console.log('[authStore.init] start');
     // Load device ID
     const deviceId = await getOrCreateDeviceId();
     set({ deviceId });
@@ -75,12 +77,32 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (savedLang) set({ lang: savedLang });
 
     if (!FB_ON) {
+      console.log('[authStore.init] FB_ON=false, setting authReady immediately');
       set({ authReady: true, metaReady: true });
       return;
     }
 
+    // If Firebase Auth failed to initialize, unblock the app immediately
+    if (!fbAuthAvailable()) {
+      console.log('[authStore.init] Firebase Auth unavailable — unblocking immediately');
+      set({ authReady: true, metaReady: true });
+      return;
+    }
+
+    console.log('[authStore.init] FB_ON=true, auth available — registering observer...');
+
+    // Safety timeout: if auth observer never fires (e.g. network issue), unblock the app
+    const authTimeout = setTimeout(() => {
+      if (!get().authReady) {
+        console.warn('[authStore.init] TIMEOUT — auth observer never fired, forcing authReady');
+        set({ authReady: true, metaReady: true });
+      }
+    }, 6000);
+
     // Observe Firebase auth
     fbAuthObserve(async (u) => {
+      console.log('[authObserver] fired, user:', u ? u.email : 'null');
+      clearTimeout(authTimeout);
       set({ user: u || null, uid: u?.uid || null });
       if (!u) {
         set({ authed: false, activeHome: null, authReady: true, metaReady: true });

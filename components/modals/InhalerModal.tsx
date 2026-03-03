@@ -1,12 +1,12 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, ScrollView } from 'react-native';
 import Modal from 'react-native-modal';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { useState } from 'react';
 import { useAppStore } from '../../stores/appStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useHousehold } from '../../hooks/useHousehold';
-import { G } from '../../constants/colors';
+import { G, SHADOWS } from '../../constants/colors';
+import { FONTS } from '../../constants/fonts';
 import { today } from '../../utils/data';
 
 export function InhalerModal() {
@@ -20,9 +20,7 @@ export function InhalerModal() {
   const addInhaler = useAppStore((s) => s.addInhaler);
   const saveEditedInhaler = useAppStore((s) => s.saveEditedInhaler);
   const uid = useAuthStore((s) => s.uid);
-  const { homeKey, catId } = useHousehold();
-
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const { homeKey, catId, currentCat } = useHousehold();
 
   const isEdit = modal === 'editInhaler';
   const visible = modal === 'inhaler' || modal === 'editInhaler';
@@ -42,89 +40,102 @@ export function InhalerModal() {
     }
   };
 
+  const dosageName = currentCat?.inhalerInfo?.dosage || inhalerForm.dosage;
+
   return (
     <Modal
       isVisible={visible}
       onBackdropPress={close}
       style={styles.modal}
-      backdropOpacity={0.65}
+      backdropOpacity={0.35}
       avoidKeyboard
     >
       <View style={styles.sheet}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>{t('inhalerModal')}</Text>
-          <TouchableOpacity style={styles.closeBtn} onPress={close}>
-            <Text style={{ color: G.muted, fontSize: 16 }}>✕</Text>
-          </TouchableOpacity>
+        {/* Drag handle */}
+        <View style={styles.handleRow}>
+          <View style={styles.handle} />
         </View>
 
-        <ScrollView keyboardShouldPersistTaps="handled">
-          {/* Date */}
-          <Text style={styles.label}>{t('date')}</Text>
-          <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)}>
-            <Text style={{ color: G.text }}>{inhalerForm.date}</Text>
-          </TouchableOpacity>
-          {showDatePicker && (
-            <DateTimePicker
-              value={new Date(inhalerForm.date + 'T12:00:00')}
-              mode="date"
-              display="default"
-              maximumDate={new Date()}
-              onChange={(_, d) => {
-                setShowDatePicker(false);
-                if (d) {
-                  setInhalerForm({ date: d.toISOString().split('T')[0] });
-                }
-              }}
-            />
-          )}
-
-          {/* Breaths */}
-          <Text style={[styles.label, { marginTop: 16 }]}>{t('numBreaths')}</Text>
-          <View style={styles.breathsRow}>
-            {[1, 2, 3, 4, 5].map((n) => (
-              <TouchableOpacity
-                key={n}
-                style={[
-                  styles.breathBtn,
-                  inhalerForm.breaths === n && styles.breathBtnActive,
-                ]}
-                onPress={() => setInhalerForm({ breaths: n })}
-              >
-                <Text style={[styles.breathNum, inhalerForm.breaths === n && { color: G.mint }]}>
-                  {n}
-                </Text>
-              </TouchableOpacity>
-            ))}
+        <View style={styles.content}>
+          {/* Header */}
+          <View style={styles.header}>
+            <View>
+              <Text style={styles.title}>{t('logInhaler')}</Text>
+              <Text style={styles.subtitle}>{isEdit ? t('edit') : t('logInhalerSub')}</Text>
+            </View>
+            <TouchableOpacity style={styles.closeBtn} onPress={close}>
+              <MaterialIcons name="close" size={20} color={G.sub} />
+            </TouchableOpacity>
           </View>
-          <TextInput
-            style={[styles.input, { marginTop: 8 }]}
-            value={String(inhalerForm.breaths)}
-            onChangeText={(v) =>
-              setInhalerForm({ breaths: Math.max(1, Number(v) || 1) })
-            }
-            keyboardType="numeric"
-            placeholder={t('numBreaths')}
-            placeholderTextColor={G.muted}
-          />
 
-          {/* Dosage */}
-          <Text style={[styles.label, { marginTop: 16 }]}>{t('dosage')}</Text>
-          <TextInput
-            style={[styles.input, { marginBottom: 16 }]}
-            value={inhalerForm.dosage}
-            onChangeText={(v) => setInhalerForm({ dosage: v })}
-            placeholder={t('dosageP')}
-            placeholderTextColor={G.muted}
-          />
+          <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+            {/* Medication card */}
+            <View style={styles.medCard}>
+              <View style={styles.medIcon}>
+                <MaterialIcons name="medication" size={20} color="#3B82F6" />
+              </View>
+              <View>
+                <Text style={styles.medLabel}>MEDICATION</Text>
+                <Text style={styles.medName}>{dosageName}</Text>
+              </View>
+            </View>
 
-          <TouchableOpacity style={styles.saveBtn} onPress={save}>
-            <Text style={styles.saveBtnText}>
-              {isEdit ? `${t('edit')} ${t('inhalerLog')}` : t('saveInhaler')}
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
+            {/* Breaths Taken */}
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionIcon}>
+                <MaterialIcons name="air" size={18} color={G.mint} />
+              </View>
+              <Text style={styles.sectionLabel}>{t('breathsTaken')}</Text>
+            </View>
+
+            <Text style={styles.breathsNumber}>{inhalerForm.breaths}</Text>
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.breathsScroll}
+            >
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => {
+                const active = inhalerForm.breaths === n;
+                return (
+                  <TouchableOpacity
+                    key={n}
+                    style={[styles.breathCircle, active && styles.breathCircleActive]}
+                    onPress={() => setInhalerForm({ breaths: n })}
+                  >
+                    <Text style={[styles.breathCircleText, active && styles.breathCircleTextActive]}>
+                      {n}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+
+            {/* Notes */}
+            <View style={[styles.sectionHeader, { marginTop: 24 }]}>
+              <View style={[styles.sectionIcon, { backgroundColor: 'rgba(78,205,196,0.08)' }]}>
+                <MaterialIcons name="edit" size={16} color={G.mint} />
+              </View>
+              <Text style={styles.sectionLabel}>{t('notesOptional')}</Text>
+            </View>
+            <TextInput
+              style={styles.textarea}
+              value={inhalerForm.dosage !== dosageName ? '' : ''}
+              placeholder={t('notesP')}
+              placeholderTextColor={G.muted}
+              multiline
+              numberOfLines={3}
+            />
+
+            {/* Save */}
+            <TouchableOpacity style={[styles.saveBtn, SHADOWS.mint]} onPress={save}>
+              <MaterialIcons name="check" size={20} color="#FFFFFF" />
+              <Text style={styles.saveBtnText}>
+                {isEdit ? `${t('edit')} ${t('inhalerLog')}` : t('saveLog')}
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
       </View>
     </Modal>
   );
@@ -133,57 +144,125 @@ export function InhalerModal() {
 const styles = StyleSheet.create({
   modal: { justifyContent: 'flex-end', margin: 0 },
   sheet: {
-    backgroundColor: '#121827',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    padding: 28,
-    paddingBottom: 52,
-    borderWidth: 1,
-    borderColor: G.border,
-    borderBottomWidth: 0,
-    maxHeight: '80%',
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    paddingBottom: 40,
+    maxHeight: '85%',
   },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-  title: { color: G.text, fontSize: 20, fontWeight: '700' },
+  handleRow: { alignItems: 'center', paddingTop: 12, paddingBottom: 8 },
+  handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: G.dim },
+  content: { paddingHorizontal: 24 },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 24,
+  },
+  title: { color: G.text, fontSize: 22, fontFamily: FONTS.extraBold },
+  subtitle: { color: G.sub, fontSize: 13, fontFamily: FONTS.regular, marginTop: 2 },
   closeBtn: {
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    borderRadius: 50,
-    width: 32,
-    height: 32,
+    backgroundColor: G.surface,
+    borderRadius: 20,
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  label: { color: G.muted, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 },
-  input: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1,
-    borderColor: G.border,
-    borderRadius: 12,
+
+  // Medication card
+  medCard: {
+    backgroundColor: '#EFF6FF',
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 24,
+  },
+  medIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#DBEAFE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  medLabel: {
+    color: '#3B82F6',
+    fontSize: 10,
+    fontFamily: FONTS.extraBold,
+    letterSpacing: 0.5,
+  },
+  medName: { color: G.text, fontSize: 15, fontFamily: FONTS.bold, marginTop: 2 },
+
+  // Section headers
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
+  sectionIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(78,205,196,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sectionLabel: { color: G.text, fontSize: 14, fontFamily: FONTS.semiBold },
+
+  // Breaths
+  breathsNumber: {
+    color: G.mint,
+    fontSize: 48,
+    fontFamily: FONTS.extraBold,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  breathsScroll: {
+    paddingHorizontal: 4,
+    gap: 10,
+    marginBottom: 8,
+  },
+  breathCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: G.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  breathCircleActive: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: G.mint,
+    ...SHADOWS.mint,
+  },
+  breathCircleText: { color: G.sub, fontSize: 16, fontFamily: FONTS.bold },
+  breathCircleTextActive: { color: '#FFFFFF', fontSize: 18, fontFamily: FONTS.extraBold },
+
+  // Notes
+  textarea: {
+    backgroundColor: '#F3F0EF',
+    borderRadius: 14,
     color: G.text,
     fontSize: 15,
-    padding: 12,
+    fontFamily: FONTS.regular,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    height: 70,
+    textAlignVertical: 'top',
+    marginBottom: 24,
   },
-  breathsRow: { flexDirection: 'row', gap: 8 },
-  breathBtn: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.1)',
-    alignItems: 'center',
-  },
-  breathBtnActive: { borderColor: G.mint, backgroundColor: 'rgba(78,205,196,0.15)' },
-  breathNum: { color: G.muted, fontSize: 16, fontWeight: '700' },
+
+  // Save
   saveBtn: {
     backgroundColor: G.mint,
-    borderRadius: 16,
-    padding: 15,
+    borderRadius: 18,
+    paddingVertical: 16,
+    flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: G.mint,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 4,
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 8,
   },
-  saveBtnText: { color: '#0a0f1e', fontWeight: '700', fontSize: 15 },
+  saveBtnText: { color: '#FFFFFF', fontFamily: FONTS.bold, fontSize: 16 },
 });

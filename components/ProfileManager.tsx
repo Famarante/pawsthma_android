@@ -8,11 +8,13 @@ import {
   ScrollView,
 } from 'react-native';
 import Modal from 'react-native-modal';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../stores/appStore';
 import { useAuthStore } from '../stores/authStore';
 import { useHousehold } from '../hooks/useHousehold';
-import { G, PCOLS, EMOJIS } from '../constants/colors';
+import { G, PCOLS, EMOJIS, SHADOWS } from '../constants/colors';
+import { FONTS } from '../constants/fonts';
 import { mkId } from '../utils/data';
 import { Profile } from '../types';
 
@@ -27,7 +29,6 @@ export function ProfileManager() {
   const [local, setLocal] = useState<Profile[]>([]);
   const [err, setErr] = useState<string | null>(null);
 
-  // Reset local state when opened
   const onOpen = () => {
     setLocal(profiles.map((p) => ({ ...p })));
     setErr(null);
@@ -68,50 +69,57 @@ export function ProfileManager() {
       onBackdropPress={() => setShowMgr(false)}
       onModalShow={onOpen}
       style={styles.modal}
-      backdropOpacity={0.7}
+      backdropOpacity={0.35}
     >
       <View style={styles.sheet}>
-        <View style={styles.header}>
-          <Text style={styles.title}>{t('editProfiles')}</Text>
-          <TouchableOpacity style={styles.closeBtn} onPress={() => setShowMgr(false)}>
-            <Text style={{ color: G.muted, fontSize: 16 }}>✕</Text>
-          </TouchableOpacity>
+        <View style={styles.handleRow}>
+          <View style={styles.handle} />
         </View>
 
-        <ScrollView style={{ maxHeight: 400 }}>
-          {local.map((p) => (
-            <View key={p.id} style={styles.profileRow}>
-              <View style={[styles.emojiBtn, { backgroundColor: `${p.color}18`, borderColor: `${p.color}50` }]}>
-                <Text style={{ fontSize: 24 }}>{p.emoji}</Text>
-              </View>
-              <TextInput
-                style={[styles.nameInput, { borderColor: p.name ? `${p.color}60` : G.border }]}
-                value={p.name}
-                onChangeText={(v) => upd(p.id, 'name', v)}
-                placeholder={t('namePlaceholder')}
-                placeholderTextColor={G.muted}
-                maxLength={20}
-              />
-              {local.length > 1 && (
-                <TouchableOpacity style={styles.removeBtn} onPress={() => rem(p.id)}>
-                  <Text style={{ color: G.coral, fontSize: 13 }}>✕</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          ))}
-
-          {local.length < 8 && (
-            <TouchableOpacity style={styles.addBtn} onPress={add}>
-              <Text style={{ color: G.muted, fontSize: 12 }}>{t('addPerson')}</Text>
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{t('editProfiles')}</Text>
+            <TouchableOpacity style={styles.closeBtn} onPress={() => setShowMgr(false)}>
+              <MaterialIcons name="close" size={20} color={G.sub} />
             </TouchableOpacity>
-          )}
-        </ScrollView>
+          </View>
 
-        {err && <Text style={styles.err}>{err}</Text>}
+          <ScrollView style={{ maxHeight: 400 }}>
+            {local.map((p) => (
+              <View key={p.id} style={[styles.profileRow, SHADOWS.card]}>
+                <View style={[styles.emojiBtn, { backgroundColor: `${p.color}12`, borderColor: `${p.color}35` }]}>
+                  <Text style={{ fontSize: 24 }}>{p.emoji}</Text>
+                </View>
+                <TextInput
+                  style={[styles.nameInput, { borderColor: p.name ? `${p.color}50` : G.border }]}
+                  value={p.name}
+                  onChangeText={(v) => upd(p.id, 'name', v)}
+                  placeholder={t('namePlaceholder')}
+                  placeholderTextColor={G.muted}
+                  maxLength={20}
+                />
+                {local.length > 1 && (
+                  <TouchableOpacity style={styles.removeBtn} onPress={() => rem(p.id)}>
+                    <MaterialIcons name="close" size={14} color={G.coral} />
+                  </TouchableOpacity>
+                )}
+              </View>
+            ))}
 
-        <TouchableOpacity style={styles.doneBtn} onPress={save}>
-          <Text style={styles.doneBtnText}>{t('done')}</Text>
-        </TouchableOpacity>
+            {local.length < 8 && (
+              <TouchableOpacity style={styles.addBtn} onPress={add}>
+                <MaterialIcons name="add" size={16} color={G.muted} />
+                <Text style={styles.addBtnText}>{t('addPerson')}</Text>
+              </TouchableOpacity>
+            )}
+          </ScrollView>
+
+          {err && <Text style={styles.err}>{err}</Text>}
+
+          <TouchableOpacity style={[styles.doneBtn, SHADOWS.mint]} onPress={save}>
+            <Text style={styles.doneBtnText}>{t('done')}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </Modal>
   );
@@ -120,31 +128,27 @@ export function ProfileManager() {
 const styles = StyleSheet.create({
   modal: { justifyContent: 'flex-end', margin: 0 },
   sheet: {
-    backgroundColor: '#121827',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    padding: 24,
-    paddingBottom: 48,
-    borderWidth: 1,
-    borderColor: G.border,
-    borderBottomWidth: 0,
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
   },
+  handleRow: { alignItems: 'center', paddingTop: 12, paddingBottom: 4 },
+  handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: G.dim },
+  content: { padding: 24, paddingBottom: 40 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  title: { color: G.text, fontSize: 19, fontWeight: '700' },
+  title: { color: G.text, fontSize: 19, fontFamily: FONTS.bold },
   closeBtn: {
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    borderRadius: 50,
+    backgroundColor: G.surface,
+    borderRadius: 20,
     width: 32,
     height: 32,
     alignItems: 'center',
     justifyContent: 'center',
   },
   profileRow: {
-    backgroundColor: G.surface,
-    borderWidth: 1,
-    borderColor: G.border,
-    borderRadius: 16,
-    padding: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 14,
     marginBottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
@@ -160,17 +164,17 @@ const styles = StyleSheet.create({
   },
   nameInput: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: G.bgInput,
     borderWidth: 1.5,
-    borderRadius: 12,
+    borderRadius: 14,
     color: G.text,
     fontSize: 14,
-    padding: 10,
+    fontFamily: FONTS.regular,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
   },
   removeBtn: {
-    backgroundColor: 'rgba(255,107,107,0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,107,107,0.3)',
+    backgroundColor: 'rgba(255,107,107,0.06)',
     borderRadius: 10,
     padding: 6,
   },
@@ -179,16 +183,21 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1.5,
     borderColor: G.border,
+    borderStyle: 'dashed',
     alignItems: 'center',
     marginBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
   },
-  err: { color: G.coral, fontSize: 12, marginBottom: 10, textAlign: 'center' },
+  addBtnText: { color: G.muted, fontSize: 12, fontFamily: FONTS.medium },
+  err: { color: G.coral, fontSize: 12, fontFamily: FONTS.medium, marginBottom: 10, textAlign: 'center' },
   doneBtn: {
     backgroundColor: G.mint,
-    borderRadius: 14,
-    padding: 14,
+    borderRadius: 16,
+    paddingVertical: 15,
     alignItems: 'center',
     marginTop: 8,
   },
-  doneBtnText: { color: '#0a0f1e', fontWeight: '700', fontSize: 15 },
+  doneBtnText: { color: '#FFFFFF', fontFamily: FONTS.bold, fontSize: 15 },
 });

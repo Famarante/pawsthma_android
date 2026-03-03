@@ -27,6 +27,17 @@ export interface Cat {
   attacks: Attack[];
   inhalerLogs: InhalerLog[];
   inhalerInfo: InhalerInfo;
+  breed?: string;
+  birthDate?: string;
+  weight?: number;
+  gender?: 'male' | 'female';
+  vetName?: string;
+  vetClinic?: string;
+  vetPhone?: string;
+  vetAddress?: string;
+  diagnosis?: string;
+  photo?: string; // base64 data URI
+  medications?: { name: string; dosage: string; frequency: string }[];
 }
 
 export interface Profile {
@@ -54,7 +65,7 @@ export type SyncStatus = 'loading' | 'live' | 'updated' | 'synced' | 'error' | '
 
 export type TabId = 'dashboard' | 'attacks' | 'inhaler' | 'insights';
 
-export type ModalType = 'attack' | 'editAttack' | 'inhaler' | 'editInhaler' | null;
+export type ModalType = 'attack' | 'editAttack' | 'inhaler' | 'editInhaler' | 'chooser' | null;
 
 export interface AttackForm {
   date: string;

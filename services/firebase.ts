@@ -54,6 +54,7 @@ if (FB_ON) {
   } catch (e) {
     console.error('Firebase init error:', e);
   }
+  console.log('[firebase] FB_ON:', FB_ON, '| auth:', auth ? 'ok' : 'NULL', '| db:', db ? 'ok' : 'NULL');
 }
 
 // ─── Refs ────────────────────────────────────────────────────────────────────
@@ -150,6 +151,9 @@ export const fbRedeemInvite = async (args: {
 };
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
+
+/** True if Firebase Auth was successfully initialized */
+export const fbAuthAvailable = () => auth !== null;
 
 export const fbAuthObserve = (cb: (user: User | null) => void): (() => void) => {
   if (!auth) return () => {};
