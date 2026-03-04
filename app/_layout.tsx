@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
+import { MaterialIcons } from '@expo/vector-icons';
 import * as SplashScreen from 'expo-splash-screen';
 import { useAuthStore } from '../stores/authStore';
 import '../utils/i18n';
@@ -14,7 +15,8 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const init = useAuthStore((s) => s.init);
 
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
+    ...MaterialIcons.font,
     'Manrope-Regular': require('../assets/fonts/Manrope-Regular.ttf'),
     'Manrope-Medium': require('../assets/fonts/Manrope-Medium.ttf'),
     'Manrope-SemiBold': require('../assets/fonts/Manrope-SemiBold.ttf'),
@@ -28,10 +30,10 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (fontsLoaded) {
+    if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, fontError]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

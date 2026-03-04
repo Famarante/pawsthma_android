@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { ScrollView, View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import Modal from 'react-native-modal';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../../stores/appStore';
@@ -11,6 +13,18 @@ import { AppHeader } from '../../components/AppHeader';
 import { WhoBadge } from '../../components/WhoBadge';
 import { Attack } from '../../types';
 
+const fmtTime = (dateStr: string): string | null => {
+  if (!dateStr.includes('T')) return null;
+  const timePart = dateStr.split('T')[1];
+  if (!timePart) return null;
+  const [h, m] = timePart.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
+};
+
+type SevFilter = 'all' | 'mild' | 'moderate' | 'severe';
+
 export default function AttacksTab() {
   const { t } = useTranslation();
   const lang = useAuthStore((s) => s.lang);
@@ -22,7 +36,11 @@ export default function AttacksTab() {
   const catId = useAppStore((s) => s.catId);
   const { homeKey, attacks, profiles } = useHousehold();
 
-  const groups = groupAttacksByDate(attacks, lang);
+  const [filterSev, setFilterSev] = useState<SevFilter>('all');
+  const [showFilter, setShowFilter] = useState(false);
+
+  const filteredAttacks = filterSev === 'all' ? attacks : attacks.filter((a) => a.severity === filterSev);
+  const groups = groupAttacksByDate(filteredAttacks, lang);
 
   const handleEdit = (a: Attack) => {
     const totalSec = Math.max(0, Math.round(Number(a.duration || 0) * 60));
@@ -34,6 +52,7 @@ export default function AttacksTab() {
       durationMin: String(Math.floor(totalSec / 60)),
       durationSec: String(totalSec % 60),
       notes: a.notes || '',
+      triggers: a.triggers || [],
     });
     setEditAttackId(a.id);
     setModal('editAttack');
@@ -67,8 +86,11 @@ export default function AttacksTab() {
           {/* Title */}
           <View style={styles.headerRow}>
             <Text style={styles.screenTitle}>{t('attackHistory')}</Text>
-            <TouchableOpacity style={styles.filterBtn}>
-              <MaterialIcons name="filter-list" size={20} color={G.sub} />
+            <TouchableOpacity
+              style={[styles.filterBtn, filterSev !== 'all' && styles.filterBtnActive]}
+              onPress={() => setShowFilter(true)}
+            >
+              <MaterialIcons name="filter-list" size={20} color={filterSev !== 'all' ? G.primary : G.sub} />
             </TouchableOpacity>
           </View>
 
@@ -104,8 +126,23 @@ export default function AttacksTab() {
                         <View style={styles.metaRow}>
                           <MaterialIcons name="schedule" size={13} color={G.muted} />
                           <Text style={styles.metaText}>{fmtDuration(a.duration, lang)}</Text>
+                          {fmtTime(a.date) && (
+                            <View style={styles.timePill}>
+                              <MaterialIcons name="access-time" size={11} color={G.sub} />
+                              <Text style={styles.timePillText}>{fmtTime(a.date)}</Text>
+                            </View>
+                          )}
                           <WhoBadge addedBy={a.addedBy} profiles={profiles} />
                         </View>
+                        {a.triggers && a.triggers.length > 0 && (
+                          <View style={styles.triggerRow}>
+                            {a.triggers.map((tr) => (
+                              <View key={tr} style={styles.triggerChip}>
+                                <Text style={styles.triggerChipText}>{t(`triggerLabels.${tr}`)}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        )}
                       </View>
                       <View style={[styles.sevBadge, { backgroundColor: SEV_BG[a.severity] }]}>
                         <Text style={[styles.sevText, { color: SEV_TEXT[a.severity] || SEV[a.severity] }]}>
@@ -134,14 +171,41 @@ export default function AttacksTab() {
             </View>
           ))}
 
-          {!attacks.length && (
+          {!filteredAttacks.length && (
             <View style={styles.empty}>
               <MaterialIcons name="favorite-border" size={48} color={G.dim} />
-              <Text style={styles.emptyText}>No attacks recorded yet</Text>
+              <Text style={styles.emptyText}>{filterSev !== 'all' ? t('noAttacksFilter') : t('noAttacksYet')}</Text>
             </View>
           )}
         </ScrollView>
 
+        {/* Filter modal */}
+        <Modal
+          isVisible={showFilter}
+          onBackdropPress={() => setShowFilter(false)}
+          style={{ justifyContent: 'flex-end', margin: 0 }}
+          backdropOpacity={0.35}
+        >
+          <View style={styles.filterSheet}>
+            <View style={styles.filterHandle} />
+            <Text style={styles.filterTitle}>{t('filterBySeverity')}</Text>
+            {(['all', 'mild', 'moderate', 'severe'] as SevFilter[]).map((sev) => (
+              <TouchableOpacity
+                key={sev}
+                style={[styles.filterOption, filterSev === sev && styles.filterOptionActive]}
+                onPress={() => { setFilterSev(sev); setShowFilter(false); }}
+              >
+                {sev !== 'all' && (
+                  <View style={[styles.filterDot, { backgroundColor: SEV[sev] }]} />
+                )}
+                <Text style={[styles.filterOptionText, filterSev === sev && { color: G.primary, fontFamily: FONTS.bold }]}>
+                  {sev === 'all' ? t('allSeverities') : t(`sevLabels.${sev}`)}
+                </Text>
+                {filterSev === sev && <MaterialIcons name="check" size={18} color={G.primary} />}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </Modal>
       </View>
     </>
   );
@@ -240,4 +304,63 @@ const styles = StyleSheet.create({
   empty: { alignItems: 'center', paddingTop: 60, paddingBottom: 40, gap: 12 },
   emptyText: { color: G.sub, fontSize: 15, fontFamily: FONTS.medium },
 
+  // Filter button active state
+  filterBtnActive: { backgroundColor: 'rgba(255,126,103,0.12)' },
+
+  // Time pill
+  timePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: G.surface,
+    borderRadius: 8,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+  },
+  timePillText: { color: G.sub, fontSize: 11, fontFamily: FONTS.semiBold },
+
+  // Trigger chips on card
+  triggerRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 6 },
+  triggerChip: {
+    backgroundColor: 'rgba(139,92,246,0.08)',
+    borderRadius: 8,
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+  },
+  triggerChipText: { color: G.indigo, fontSize: 11, fontFamily: FONTS.semiBold },
+
+  // Filter sheet
+  filterSheet: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingBottom: 40,
+    paddingHorizontal: 24,
+    paddingTop: 12,
+  },
+  filterHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: G.dim,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  filterTitle: {
+    color: G.text,
+    fontSize: 17,
+    fontFamily: FONTS.bold,
+    marginBottom: 16,
+  },
+  filterOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+  },
+  filterOptionActive: { backgroundColor: 'rgba(255,126,103,0.04)', borderRadius: 12, paddingHorizontal: 8 },
+  filterDot: { width: 10, height: 10, borderRadius: 5 },
+  filterOptionText: { flex: 1, color: G.text, fontSize: 15, fontFamily: FONTS.medium },
 });

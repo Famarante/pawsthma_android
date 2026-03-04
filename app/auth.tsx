@@ -8,6 +8,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -17,6 +18,7 @@ import { useAuthStore } from '../stores/authStore';
 import { G, SHADOWS, GRADIENTS } from '../constants/colors';
 import { FONTS } from '../constants/fonts';
 import { LangToggle } from '../components/LangToggle';
+import { FB_ON, fbResetPassword } from '../services/firebase';
 
 export default function AuthScreen() {
   const { t } = useTranslation();
@@ -35,6 +37,19 @@ export default function AuthScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [signup, setSignup] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      Alert.alert(t('forgotPassword'), t('resetPasswordNeedEmail'));
+      return;
+    }
+    try {
+      await fbResetPassword(email.trim());
+      Alert.alert(t('forgotPassword'), t('resetPasswordSent'));
+    } catch {
+      Alert.alert(t('forgotPassword'), t('resetPasswordError'));
+    }
+  };
 
   const submit = async () => {
     if (!email.trim() || !password) {
@@ -111,9 +126,11 @@ export default function AuthScreen() {
           </View>
 
           {/* Forgot password */}
-          <TouchableOpacity style={styles.forgotRow}>
-            <Text style={styles.forgotText}>Forgot Password?</Text>
-          </TouchableOpacity>
+          {!signup && (
+            <TouchableOpacity style={styles.forgotRow} onPress={handleForgotPassword}>
+              <Text style={styles.forgotText}>{t('forgotPassword')}</Text>
+            </TouchableOpacity>
+          )}
 
           {err && <Text style={styles.err}>{err}</Text>}
 

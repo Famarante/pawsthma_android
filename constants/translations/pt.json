@@ -16,7 +16,7 @@
   "lastInhaler": "Último Inalador",
   "breaths": "{{count}} inspiração",
   "breaths_plural": "{{count}} inspirações",
-  "weekly": "Resumo Semanal",
+  "weekly": "Último Mês",
   "inhalerStatus": "Estado do Inalador",
   "dosage": "Dosagem",
   "lastCleaned": "Última Limpeza",
@@ -197,5 +197,36 @@
   "fab": {
     "addAction": "Adicionar registo",
     "chooseAction": "O que queres registar?"
-  }
+  },
+  "forgotPassword": "Esqueceste a palavra-passe?",
+  "resetPasswordSent": "Email de recuperação enviado. Verifica a tua caixa de entrada.",
+  "resetPasswordError": "Não foi possível enviar o email. Verifica o endereço.",
+  "resetPasswordNeedEmail": "Introduz primeiro o teu endereço de email.",
+  "triggers": "Gatilhos (opcional)",
+  "triggerLabels": {
+    "food": "Alimentação",
+    "exercise": "Exercício",
+    "weather": "Clima",
+    "stress": "Stress",
+    "unknown": "Desconhecido"
+  },
+  "filterBySeverity": "Filtrar por Gravidade",
+  "allSeverities": "Todas",
+  "noAttacksYet": "Nenhuma crise registada ainda",
+  "noAttacksFilter": "Nenhuma crise corresponde a este filtro",
+  "weekTrendMore": "+{{n}} vs semana passada",
+  "weekTrendFewer": "-{{n}} vs semana passada",
+  "weekTrendSame": "Igual à semana passada",
+  "attackFreeStreak": "{{n}} dias sem crises",
+  "keepItUp": "Continua assim!",
+  "dateRange": "Período",
+  "last30Days": "Últimos 30 Dias",
+  "last90Days": "Últimos 3 Meses",
+  "allTime": "Todo o Período",
+  "topTriggerInsight": "Gatilho mais comum: {{trigger}} ({{count}} de {{total}} crises)",
+  "addMedication": "Adicionar Medicação",
+  "medicationName": "Nome da medicação",
+  "medicationDosage": "Dosagem",
+  "medicationFrequency": "Frequência",
+  "removeMedication": "Remover"
 }

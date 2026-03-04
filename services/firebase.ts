@@ -15,6 +15,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut,
   Auth,
   User,
@@ -173,6 +174,11 @@ export const fbSignUp = async (email: string, password: string) => {
 export const fbSignOut = async () => {
   if (!auth) return;
   return signOut(auth);
+};
+
+export const fbResetPassword = async (email: string): Promise<void> => {
+  if (!auth) throw new Error('auth-not-configured');
+  return sendPasswordResetEmail(auth, email);
 };
 
 // ─── FCM token ───────────────────────────────────────────────────────────────

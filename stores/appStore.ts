@@ -87,6 +87,7 @@ interface AppState {
   saveProfiles: (profiles: Profile[], homeKey: string, uid: string | null) => Promise<void>;
   saveCatInfo: (catInfo: Partial<Cat>, homeKey: string, catId: string, uid: string | null) => Promise<void>;
   addCat: (name: string, homeKey: string, uid: string | null) => Promise<string>;
+  saveMedications: (meds: { name: string; dosage: string; frequency: string }[], homeKey: string, catId: string, uid: string | null) => Promise<void>;
 
   handleHouseholdAction: (
     payload: HouseholdActionPayload,
@@ -117,6 +118,7 @@ const DEFAULT_ATTACK_FORM: AttackForm = {
   durationMin: '',
   durationSec: '0',
   notes: '',
+  triggers: [],
 };
 
 const DEFAULT_INHALER_FORM: InhalerForm = {
@@ -255,6 +257,7 @@ export const useAppStore = create<AppState>((set, get) => ({
                         duration,
                         notes: attackForm.notes,
                         addedBy: uid || '',
+                        triggers: attackForm.triggers || [],
                       },
                     ],
                   }
@@ -289,7 +292,7 @@ export const useAppStore = create<AppState>((set, get) => ({
                     ...c,
                     attacks: c.attacks.map((a) =>
                       a.id === editAttackId
-                        ? { ...a, date: attackForm.date, severity: attackForm.severity, duration, notes: attackForm.notes }
+                        ? { ...a, date: attackForm.date, severity: attackForm.severity, duration, notes: attackForm.notes, triggers: attackForm.triggers || [] }
                         : a,
                     ),
                   }
@@ -462,6 +465,26 @@ export const useAppStore = create<AppState>((set, get) => ({
             ...d.households[homeKey],
             cats: d.households[homeKey].cats.map((c) =>
               c.id === catId ? { ...c, ...catInfo } : c,
+            ),
+          },
+        },
+      }),
+      homeKey,
+      uid,
+    );
+  },
+
+  saveMedications: async (meds, homeKey, catId, uid) => {
+    const { doSave } = get();
+    await doSave(
+      (d) => ({
+        ...d,
+        households: {
+          ...d.households,
+          [homeKey]: {
+            ...d.households[homeKey],
+            cats: d.households[homeKey].cats.map((c) =>
+              c.id === catId ? { ...c, medications: meds } : c,
             ),
           },
         },

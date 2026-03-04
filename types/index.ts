@@ -1,3 +1,5 @@
+export type TriggerType = 'food' | 'exercise' | 'weather' | 'stress' | 'unknown';
+
 export interface Attack {
   id: number;
   date: string;
@@ -5,6 +7,7 @@ export interface Attack {
   duration: number; // in minutes (fractional)
   notes: string;
   addedBy: string;
+  triggers?: TriggerType[];
 }
 
 export interface InhalerLog {
@@ -73,6 +76,7 @@ export interface AttackForm {
   durationMin: string;
   durationSec: string;
   notes: string;
+  triggers: TriggerType[];
 }
 
 export interface InhalerForm {

@@ -16,7 +16,7 @@
   "lastInhaler": "Last Inhaler",
   "breaths": "{{count}} breath",
   "breaths_plural": "{{count}} breaths",
-  "weekly": "Weekly Overview",
+  "weekly": "Last Month",
   "inhalerStatus": "Inhaler Status",
   "dosage": "Dosage",
   "lastCleaned": "Last Cleaned",
@@ -197,5 +197,36 @@
   "fab": {
     "addAction": "Add record",
     "chooseAction": "What would you like to record?"
-  }
+  },
+  "forgotPassword": "Forgot Password?",
+  "resetPasswordSent": "Password reset email sent. Check your inbox.",
+  "resetPasswordError": "Could not send reset email. Check your address.",
+  "resetPasswordNeedEmail": "Enter your email address first.",
+  "triggers": "Triggers (optional)",
+  "triggerLabels": {
+    "food": "Food",
+    "exercise": "Exercise",
+    "weather": "Weather",
+    "stress": "Stress",
+    "unknown": "Unknown"
+  },
+  "filterBySeverity": "Filter by Severity",
+  "allSeverities": "All",
+  "noAttacksYet": "No attacks recorded yet",
+  "noAttacksFilter": "No attacks match this filter",
+  "weekTrendMore": "+{{n}} vs last week",
+  "weekTrendFewer": "-{{n}} vs last week",
+  "weekTrendSame": "Same as last week",
+  "attackFreeStreak": "{{n}} days attack-free",
+  "keepItUp": "Keep it up!",
+  "dateRange": "Date Range",
+  "last30Days": "Last 30 Days",
+  "last90Days": "Last 3 Months",
+  "allTime": "All Time",
+  "topTriggerInsight": "Most common trigger: {{trigger}} ({{count}} of {{total}} attacks)",
+  "addMedication": "Add Medication",
+  "medicationName": "Medication name",
+  "medicationDosage": "Dosage",
+  "medicationFrequency": "Frequency",
+  "removeMedication": "Remove"
 }

@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -23,10 +23,11 @@
       },
       "package": "com.pawsthma.app",
       "permissions": [
-        "NOTIFICATIONS",
-        "RECEIVE_BOOT_COMPLETED",
-        "VIBRATE",
-        "CAMERA"
+        "android.permission.NOTIFICATIONS",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -36,7 +37,18 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Manrope-Regular.ttf",
+            "./assets/fonts/Manrope-Medium.ttf",
+            "./assets/fonts/Manrope-SemiBold.ttf",
+            "./assets/fonts/Manrope-Bold.ttf",
+            "./assets/fonts/Manrope-ExtraBold.ttf"
+          ]
+        }
+      ],
       [
         "expo-notifications",
         {
@@ -64,6 +76,14 @@
     "experiments": {
       "typedRoutes": true
     },
-    "scheme": "pawsthma"
+    "scheme": "pawsthma",
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "e5f649ef-e6b5-48e5-befd-c4e4ef7f6c13"
+      }
+    }
   }
 }

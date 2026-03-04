@@ -4,7 +4,12 @@
       "Bash(npx expo:*)",
       "Bash(npx tsc:*)",
       "Bash(ls:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(node:*)",
+      "Bash(echo ANDROID_HOME: $ANDROID_HOME:*)",
+      "Bash(echo ANDROID_HOME=$ANDROID_HOME:*)",
+      "Bash(npx:*)",
+      "Bash(eas:*)"
     ]
   }
 }

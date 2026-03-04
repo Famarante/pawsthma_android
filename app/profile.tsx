@@ -19,10 +19,12 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { currentCat, homeKey, catId } = useHousehold();
   const saveCatInfo = useAppStore((s) => s.saveCatInfo);
+  const saveMedications = useAppStore((s) => s.saveMedications);
   const uid = useAuthStore((s) => s.uid);
 
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<Partial<Cat>>({});
+  const [meds, setMeds] = useState<{ name: string; dosage: string; frequency: string }[]>([]);
 
   if (!currentCat) return null;
 
@@ -63,6 +65,7 @@ export default function ProfileScreen() {
       vetAddress: cat.vetAddress || '',
       diagnosis: cat.diagnosis || '',
     });
+    setMeds(cat.medications ? cat.medications.map((m) => ({ ...m })) : []);
     setEditing(true);
   };
 
@@ -73,8 +76,14 @@ export default function ProfileScreen() {
       cleaned.weight = Number(cleaned.weight) || undefined;
     }
     await saveCatInfo(cleaned, homeKey, catId, uid);
+    await saveMedications(meds.filter((m) => m.name.trim()), homeKey, catId, uid);
     setEditing(false);
   };
+
+  const addMed = () => setMeds((prev) => [...prev, { name: '', dosage: '', frequency: '' }]);
+  const updateMed = (i: number, key: string, val: string) =>
+    setMeds((prev) => prev.map((m, idx) => idx === i ? { ...m, [key]: val } : m));
+  const removeMed = (i: number) => setMeds((prev) => prev.filter((_, idx) => idx !== i));
 
   const handleCancel = () => {
     setEditing(false);
@@ -344,6 +353,42 @@ export default function ProfileScreen() {
           multiline
         />
 
+        {/* Medications */}
+        <Text style={[styles.sectionLabel, { marginTop: 8 }]}>{t('currentMedications')}</Text>
+        {meds.map((med, i) => (
+          <View key={i} style={styles.medEditCard}>
+            <TextInput
+              style={[styles.fieldInput, styles.medInput]}
+              value={med.name}
+              onChangeText={(v) => updateMed(i, 'name', v)}
+              placeholder={t('medicationName')}
+              placeholderTextColor={G.muted}
+            />
+            <TextInput
+              style={[styles.fieldInput, styles.medInput]}
+              value={med.dosage}
+              onChangeText={(v) => updateMed(i, 'dosage', v)}
+              placeholder={t('medicationDosage')}
+              placeholderTextColor={G.muted}
+            />
+            <TextInput
+              style={[styles.fieldInput, styles.medInput]}
+              value={med.frequency}
+              onChangeText={(v) => updateMed(i, 'frequency', v)}
+              placeholder={t('medicationFrequency')}
+              placeholderTextColor={G.muted}
+            />
+            <TouchableOpacity style={styles.medRemoveBtn} onPress={() => removeMed(i)}>
+              <MaterialIcons name="delete-outline" size={18} color={G.coral} />
+              <Text style={styles.medRemoveText}>{t('removeMedication')}</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+        <TouchableOpacity style={styles.addMedBtn} onPress={addMed}>
+          <MaterialIcons name="add" size={18} color={G.primary} />
+          <Text style={styles.addMedText}>{t('addMedication')}</Text>
+        </TouchableOpacity>
+
         {/* Save + Cancel buttons */}
         <TouchableOpacity style={[styles.editBtn, SHADOWS.primary]} onPress={handleSave}>
           <Text style={styles.editBtnText}>{t('save')}</Text>
@@ -564,4 +609,37 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   cancelText: { color: G.sub, fontFamily: FONTS.medium, fontSize: 15 },
+
+  // Medication edit
+  medEditCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: G.border,
+    padding: 12,
+    marginBottom: 12,
+    gap: 8,
+  },
+  medInput: { marginBottom: 0, marginTop: 0 },
+  medRemoveBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingTop: 4,
+  },
+  medRemoveText: { color: G.coral, fontSize: 12, fontFamily: FONTS.semiBold },
+  addMedBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 1.5,
+    borderColor: G.primary,
+    borderStyle: 'dashed',
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+    justifyContent: 'center',
+  },
+  addMedText: { color: G.primary, fontSize: 14, fontFamily: FONTS.semiBold },
 });

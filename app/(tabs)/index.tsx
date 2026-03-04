@@ -9,9 +9,9 @@ import { useHousehold } from '../../hooks/useHousehold';
 import { useNotifications } from '../../hooks/useNotifications';
 import { G, SHADOWS } from '../../constants/colors';
 import { FONTS } from '../../constants/fonts';
-import { fmt, buildWeeklyData } from '../../utils/data';
+import { fmt, buildDailyData, buildWeekTrend, attackFreeStreakDays } from '../../utils/data';
 import { AppHeader } from '../../components/AppHeader';
-import { WeeklyChart } from '../../components/WeeklyChart';
+import { DailyChart } from '../../components/DailyChart';
 
 export default function DashboardTab() {
   const { t } = useTranslation();
@@ -33,7 +33,9 @@ export default function DashboardTab() {
   const interval = currentCat.inhalerInfo.cleaningIntervalDays;
   const cleaningPct = Math.max(0, Math.min(1 - ds / Math.max(interval, 1), 1));
   const dueInDays = Math.max(0, interval - ds);
-  const weeklyData = buildWeeklyData(attacks, lang);
+  const weeklyData = buildDailyData(attacks);
+  const weekTrend = buildWeekTrend(attacks);
+  const streakDays = attackFreeStreakDays(attacks);
 
   // Today's inhaler logs
   const todayStr = new Date().toISOString().split('T')[0];
@@ -70,29 +72,42 @@ export default function DashboardTab() {
               {overdue ? t('overdueAlert') : t('dueIn', { d: dueInDays })}
             </Text>
           </View>
-          <Svg width={88} height={88}>
-            <Circle
-              cx={44} cy={44} r={radius}
-              stroke="#E0F7F6"
-              strokeWidth={strokeWidth}
-              fill="none"
-            />
-            <Circle
-              cx={44} cy={44} r={radius}
-              stroke={overdue ? G.coral : G.mint}
-              strokeWidth={strokeWidth}
-              fill="none"
-              strokeDasharray={`${circumference}`}
-              strokeDashoffset={strokeDashoffset}
-              strokeLinecap="round"
-              rotation="-90"
-              origin="44,44"
-            />
+          <View style={styles.ringWrap}>
+            <Svg width={88} height={88}>
+              <Circle
+                cx={44} cy={44} r={radius}
+                stroke="#E0F7F6"
+                strokeWidth={strokeWidth}
+                fill="none"
+              />
+              <Circle
+                cx={44} cy={44} r={radius}
+                stroke={overdue ? G.coral : G.mint}
+                strokeWidth={strokeWidth}
+                fill="none"
+                strokeDasharray={`${circumference}`}
+                strokeDashoffset={strokeDashoffset}
+                strokeLinecap="round"
+                rotation="-90"
+                origin="44,44"
+              />
+            </Svg>
             <View style={styles.ringCenter}>
               <Text style={styles.ringPct}>{Math.round(cleaningPct * 100)}%</Text>
             </View>
-          </Svg>
+          </View>
         </View>
+
+        {/* Attack-free streak */}
+        {streakDays >= 1 && (
+          <View style={styles.streakCard}>
+            <Text style={styles.streakEmoji}>🎉</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.streakTitle}>{t('attackFreeStreak', { n: streakDays })}</Text>
+              <Text style={styles.streakSub}>{t('keepItUp')}</Text>
+            </View>
+          </View>
+        )}
 
         {/* Weekly Activity */}
         <View style={styles.sectionRow}>
@@ -101,8 +116,18 @@ export default function DashboardTab() {
             <Text style={styles.pillText}>{t('last7Days')}</Text>
           </View>
         </View>
+        {weekTrend.diff !== 0 && (
+          <Text style={[styles.trendText, { color: weekTrend.diff > 0 ? G.coral : G.mint }]}>
+            {weekTrend.diff > 0
+              ? t('weekTrendMore', { n: weekTrend.diff })
+              : t('weekTrendFewer', { n: Math.abs(weekTrend.diff) })}
+          </Text>
+        )}
+        {weekTrend.diff === 0 && weekTrend.thisWeek > 0 && (
+          <Text style={[styles.trendText, { color: G.sub }]}>{t('weekTrendSame')}</Text>
+        )}
         <View style={[styles.card, SHADOWS.card]}>
-          <WeeklyChart data={weeklyData} />
+          <DailyChart data={weeklyData} />
         </View>
 
         {/* Today section */}
@@ -173,6 +198,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   maintSub: { color: G.sub, fontSize: 13, fontFamily: FONTS.regular },
+  ringWrap: {
+    width: 88,
+    height: 88,
+  },
   ringCenter: {
     position: 'absolute',
     top: 0, left: 0, right: 0, bottom: 0,
@@ -208,6 +237,30 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     marginBottom: 16,
+  },
+
+  // Streak
+  streakCard: {
+    backgroundColor: '#FFF9EB',
+    borderRadius: 16,
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(251,191,36,0.3)',
+  },
+  streakEmoji: { fontSize: 28 },
+  streakTitle: { color: G.text, fontSize: 15, fontFamily: FONTS.bold },
+  streakSub: { color: G.sub, fontSize: 12, fontFamily: FONTS.regular, marginTop: 2 },
+
+  // Trend
+  trendText: {
+    fontSize: 12,
+    fontFamily: FONTS.semiBold,
+    marginBottom: 8,
+    marginTop: -8,
   },
 
   // Today

@@ -1,16 +1,20 @@
-import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Modal from 'react-native-modal';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/authStore';
 import { useHousehold } from '../../hooks/useHousehold';
-import { G, SEV, SHADOWS } from '../../constants/colors';
+import { G, SHADOWS } from '../../constants/colors';
 import { FONTS } from '../../constants/fonts';
-import { fmt, fmtDuration, daysBetween, today } from '../../utils/data';
+import { fmt, daysBetween, today } from '../../utils/data';
 import { AppHeader } from '../../components/AppHeader';
 import { WeeklyChart } from '../../components/WeeklyChart';
 import { DurationChart } from '../../components/DurationChart';
 import { SeverityPie } from '../../components/SeverityPie';
 import { buildWeeklyData } from '../../utils/data';
+
+type DateRange = '30' | '90' | 'all';
 
 const OBS_ICONS = ['event-note', 'trending-up', 'error-outline', 'air'] as const;
 
@@ -18,47 +22,63 @@ export default function InsightsTab() {
   const { t } = useTranslation();
   const lang = useAuthStore((s) => s.lang);
   const { attacks, inhalerLogs } = useHousehold();
+  const [range, setRange] = useState<DateRange>('30');
+  const [showRangePicker, setShowRangePicker] = useState(false);
 
-  const sorted = [...attacks].sort((a, b) => a.date.localeCompare(b.date));
+  const todayDate = new Date();
+  const rangeDays = range === '30' ? 30 : range === '90' ? 90 : Infinity;
+
+  const filteredAttacks = range === 'all' ? attacks : attacks.filter((a) => {
+    const diff = Math.floor((todayDate.getTime() - new Date(a.date).getTime()) / 86400000);
+    return diff >= 0 && diff < rangeDays;
+  });
+  const filteredLogs = range === 'all' ? inhalerLogs : inhalerLogs.filter((l) => {
+    const diff = Math.floor((todayDate.getTime() - new Date(l.date).getTime()) / 86400000);
+    return diff >= 0 && diff < rangeDays;
+  });
+
+  const sorted = [...filteredAttacks].sort((a, b) => a.date.localeCompare(b.date));
   const lastA = sorted[sorted.length - 1];
 
-  const avgD = attacks.length
-    ? (attacks.reduce((s, a) => s + a.duration, 0) / attacks.length).toFixed(1)
+  const avgD = filteredAttacks.length
+    ? (filteredAttacks.reduce((s, a) => s + a.duration, 0) / filteredAttacks.length).toFixed(1)
     : '0';
-  const sevN = attacks.filter((a) => a.severity === 'severe').length;
+  const sevN = filteredAttacks.filter((a) => a.severity === 'severe').length;
 
-  // Adherence: days with inhaler in last 30 / 30
-  const todayDate = new Date();
-  const last30 = new Set<string>();
-  inhalerLogs.forEach((l) => {
-    const d = new Date(l.date);
-    const diff = Math.floor((todayDate.getTime() - d.getTime()) / 86400000);
-    if (diff >= 0 && diff < 30) last30.add(l.date);
-  });
-  const adherence = Math.round((last30.size / 30) * 100);
+  // Adherence: days with inhaler / range days
+  const adherenceDays = new Set<string>();
+  filteredLogs.forEach((l) => adherenceDays.add(l.date.split('T')[0]));
+  const adherencePeriod = range === 'all' ? Math.max(1, daysBetween(sorted[0]?.date || today(), today())) : rangeDays;
+  const adherence = Math.round((adherenceDays.size / Math.min(adherencePeriod, 30)) * 100);
 
-  // Trend: attacks in last 30 vs prior 30
-  const last30Attacks = attacks.filter((a) => {
+  // Trend: current period vs previous period
+  const periodDays = range === 'all' ? 30 : rangeDays;
+  const priorAttacks = attacks.filter((a) => {
     const diff = Math.floor((todayDate.getTime() - new Date(a.date).getTime()) / 86400000);
-    return diff >= 0 && diff < 30;
+    return diff >= periodDays && diff < periodDays * 2;
   }).length;
-  const prior30Attacks = attacks.filter((a) => {
-    const diff = Math.floor((todayDate.getTime() - new Date(a.date).getTime()) / 86400000);
-    return diff >= 30 && diff < 60;
-  }).length;
-  const trendPct = prior30Attacks > 0
-    ? Math.round(((last30Attacks - prior30Attacks) / prior30Attacks) * 100)
+  const trendPct = priorAttacks > 0
+    ? Math.round(((filteredAttacks.length - priorAttacks) / priorAttacks) * 100)
     : 0;
   const trendDown = trendPct <= 0;
 
+  // Trigger insights
+  const allTriggers: string[] = [];
+  filteredAttacks.forEach((a) => { if (a.triggers) allTriggers.push(...a.triggers); });
+  const triggerCounts: Record<string, number> = {};
+  allTriggers.forEach((tr) => { triggerCounts[tr] = (triggerCounts[tr] || 0) + 1; });
+  const topTriggerEntry = Object.entries(triggerCounts).sort((a, b) => b[1] - a[1])[0];
+
   const durTrend = sorted.map((a) => ({ date: fmt(a.date, lang), duration: a.duration }));
-  const weeklyData = buildWeeklyData(attacks, lang);
+  const weeklyData = buildWeeklyData(filteredAttacks, lang);
+
+  const rangeLabel = range === '30' ? t('last30Days') : range === '90' ? t('last90Days') : t('allTime');
 
   const sevDist = (['mild', 'moderate', 'severe'] as const)
     .map((n) => ({
       name: n,
       label: t(`sevLabels.${n}`),
-      value: attacks.filter((a) => a.severity === n).length,
+      value: filteredAttacks.filter((a) => a.severity === n).length,
     }))
     .filter((x) => x.value > 0);
 
@@ -66,7 +86,12 @@ export default function InsightsTab() {
     lastA && t('obs1', { d: daysBetween(lastA.date, today()), s: t(`sevLabels.${lastA.severity}`) }),
     t('obs2', { a: avgD }),
     sevN > 0 && t('obs3', { count: sevN }),
-    t('obs4', { count: inhalerLogs.length }),
+    t('obs4', { count: filteredLogs.length }),
+    topTriggerEntry && t('topTriggerInsight', {
+      trigger: t(`triggerLabels.${topTriggerEntry[0]}`),
+      count: topTriggerEntry[1],
+      total: filteredAttacks.length,
+    }),
   ].filter(Boolean) as string[];
 
   const obsColors = [G.amber, G.indigo, G.coral, G.mint];
@@ -79,11 +104,11 @@ export default function InsightsTab() {
         <View style={styles.headerRow}>
           <View>
             <Text style={styles.screenTitle}>{t('healthInsights')}</Text>
-            <Text style={styles.headerSub}>{t('last30Summary')}</Text>
+            <Text style={styles.headerSub}>{rangeLabel}</Text>
           </View>
-          <View style={styles.calendarBtn}>
+          <TouchableOpacity style={styles.calendarBtn} onPress={() => setShowRangePicker(true)}>
             <MaterialIcons name="calendar-today" size={18} color={G.sub} />
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* 3-column stat cards */}
@@ -92,7 +117,7 @@ export default function InsightsTab() {
             <View style={[styles.statIconWrap, { backgroundColor: 'rgba(255,126,103,0.15)' }]}>
               <MaterialIcons name="priority-high" size={18} color={G.primary} />
             </View>
-            <Text style={[styles.statValue, { color: G.primary }]}>{last30Attacks}</Text>
+            <Text style={[styles.statValue, { color: G.primary }]}>{filteredAttacks.length}</Text>
             <Text style={styles.statLabel}>{t('attacks')}</Text>
           </View>
 
@@ -139,13 +164,38 @@ export default function InsightsTab() {
         <Text style={styles.sectionLabel}>{t('topTriggers')}</Text>
         {observations.map((text, i) => (
           <View key={i} style={[styles.obsCard, SHADOWS.card]}>
-            <View style={[styles.obsIcon, { backgroundColor: `${obsColors[i]}12` }]}>
-              <MaterialIcons name={(OBS_ICONS[i] || 'lightbulb') as any} size={18} color={obsColors[i]} />
+            <View style={[styles.obsIcon, { backgroundColor: `${obsColors[Math.min(i, obsColors.length - 1)]}12` }]}>
+              <MaterialIcons name={(OBS_ICONS[Math.min(i, OBS_ICONS.length - 1)] || 'lightbulb') as any} size={18} color={obsColors[Math.min(i, obsColors.length - 1)]} />
             </View>
             <Text style={styles.obsText}>{text}</Text>
           </View>
         ))}
       </ScrollView>
+
+      {/* Date range picker modal */}
+      <Modal
+        isVisible={showRangePicker}
+        onBackdropPress={() => setShowRangePicker(false)}
+        style={{ justifyContent: 'flex-end', margin: 0 }}
+        backdropOpacity={0.35}
+      >
+        <View style={styles.rangeSheet}>
+          <View style={styles.rangeHandle} />
+          <Text style={styles.rangeTitle}>{t('dateRange')}</Text>
+          {([['30', t('last30Days')], ['90', t('last90Days')], ['all', t('allTime')]] as [DateRange, string][]).map(([val, label]) => (
+            <TouchableOpacity
+              key={val}
+              style={[styles.rangeOption, range === val && styles.rangeOptionActive]}
+              onPress={() => { setRange(val); setShowRangePicker(false); }}
+            >
+              <Text style={[styles.rangeOptionText, range === val && { color: G.primary, fontFamily: FONTS.bold }]}>
+                {label}
+              </Text>
+              {range === val && <MaterialIcons name="check" size={18} color={G.primary} />}
+            </TouchableOpacity>
+          ))}
+        </View>
+      </Modal>
     </>
   );
 }
@@ -234,4 +284,37 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   obsText: { color: G.sub, fontSize: 13, fontFamily: FONTS.regular, lineHeight: 20, flex: 1 },
+
+  // Range picker
+  rangeSheet: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingBottom: 40,
+    paddingHorizontal: 24,
+    paddingTop: 12,
+  },
+  rangeHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#E2E8F0',
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  rangeTitle: {
+    color: G.text,
+    fontSize: 17,
+    fontFamily: FONTS.bold,
+    marginBottom: 16,
+  },
+  rangeOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+  },
+  rangeOptionActive: {},
+  rangeOptionText: { flex: 1, color: G.text, fontSize: 15, fontFamily: FONTS.medium },
 });

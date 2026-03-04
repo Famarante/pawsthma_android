@@ -32,7 +32,15 @@ export const fmtWeekRange = (startKey: string, lang: string): string => {
   const start = parseLocalDate(startKey);
   const end = new Date(start);
   end.setDate(end.getDate() + 6);
-  return `${fmt(start, lang)}–${fmt(end, lang)}`;
+  const locale = lang === 'pt' ? 'pt-PT' : 'en-GB';
+  const startDay = start.getDate();
+  const endDay = end.getDate();
+  const startMon = start.toLocaleDateString(locale, { month: 'short' });
+  const endMon = end.toLocaleDateString(locale, { month: 'short' });
+  if (start.getMonth() === end.getMonth()) {
+    return `${startDay}–${endDay} ${startMon}`;
+  }
+  return `${startDay} ${startMon}–${endDay} ${endMon}`;
 };
 
 export const fmtDuration = (minutes: number, _lang?: string): string => {
@@ -176,7 +184,36 @@ export const buildWeeklyData = (attacks: Attack[], lang: string): WeekBucket[] =
     if (!m[w]) m[w] = { week: w, label: fmtWeekRange(w, lang), mild: 0, moderate: 0, severe: 0 };
     m[w][a.severity]++;
   });
-  return Object.values(m).slice(-6);
+  return Object.values(m).slice(-5);
+};
+
+// ─── Daily chart data (last 7 days) ─────────────────────────────────────────
+
+export interface DayBucket {
+  date: string;       // YYYY-MM-DD (local)
+  dayIndex: number;   // 0 = Sunday … 6 = Saturday
+  mild: number;
+  moderate: number;
+  severe: number;
+}
+
+export const buildDailyData = (attacks: Attack[]): DayBucket[] => {
+  const result: DayBucket[] = [];
+  const now = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const key = fmtLocalDateKey(d);
+    const day = attacks.filter((a) => a.date.split('T')[0] === key);
+    result.push({
+      date: key,
+      dayIndex: d.getDay(),
+      mild: day.filter((a) => a.severity === 'mild').length,
+      moderate: day.filter((a) => a.severity === 'moderate').length,
+      severe: day.filter((a) => a.severity === 'severe').length,
+    });
+  }
+  return result;
 };
 
 // ─── Attack grouping ────────────────────────────────────────────────────────
@@ -209,6 +246,31 @@ export const groupAttacksByDate = (attacks: Attack[], lang: string): AttackGroup
     else label = fmt(dateKey, lang);
     return { label, dateKey, items };
   });
+};
+
+// ─── Week trend helper ───────────────────────────────────────────────────────
+
+export const buildWeekTrend = (attacks: Attack[]): { thisWeek: number; lastWeek: number; diff: number } => {
+  const now = new Date();
+  let thisWeek = 0;
+  let lastWeek = 0;
+  attacks.forEach((a) => {
+    const diff = Math.floor((now.getTime() - new Date(a.date).getTime()) / 86400000);
+    if (diff >= 0 && diff < 7) thisWeek++;
+    else if (diff >= 7 && diff < 14) lastWeek++;
+  });
+  return { thisWeek, lastWeek, diff: thisWeek - lastWeek };
+};
+
+// ─── Attack-free streak ──────────────────────────────────────────────────────
+
+export const attackFreeStreakDays = (attacks: Attack[]): number => {
+  if (!attacks.length) return 0;
+  const todayKey = today();
+  const sorted = [...attacks].sort((a, b) => b.date.localeCompare(a.date));
+  const lastDate = sorted[0].date.split('T')[0];
+  if (lastDate === todayKey) return 0;
+  return daysBetween(lastDate, todayKey);
 };
 
 // ─── Misc ────────────────────────────────────────────────────────────────────

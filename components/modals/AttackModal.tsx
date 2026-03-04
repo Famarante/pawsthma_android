@@ -10,6 +10,9 @@ import { useHousehold } from '../../hooks/useHousehold';
 import { G, SEV_BG, SEV_BORDER, SEV_TEXT, SHADOWS } from '../../constants/colors';
 import { FONTS } from '../../constants/fonts';
 import { today, fmt, parseLocalDate, fmtLocalDateKey } from '../../utils/data';
+import { TriggerType } from '../../types';
+
+const TRIGGERS: TriggerType[] = ['food', 'exercise', 'weather', 'stress', 'unknown'];
 
 export function AttackModal() {
   const { t } = useTranslation();
@@ -59,7 +62,7 @@ export function AttackModal() {
   const close = () => {
     setModal(null);
     setEditAttackId(null);
-    setAttackForm({ date: nowDatetime(), severity: 'mild', durationMin: '', durationSec: '0', notes: '' });
+    setAttackForm({ date: nowDatetime(), severity: 'mild', durationMin: '', durationSec: '0', notes: '', triggers: [] });
     setShowDatePicker(false);
     setShowTimePicker(false);
   };
@@ -248,6 +251,36 @@ export function AttackModal() {
               </View>
             </View>
 
+            {/* Triggers */}
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionIcon}>
+                <MaterialIcons name="bolt" size={18} color={G.primary} />
+              </View>
+              <Text style={styles.sectionLabel}>{t('triggers')}</Text>
+            </View>
+            <View style={styles.triggerRow}>
+              {TRIGGERS.map((tr) => {
+                const active = (attackForm.triggers || []).includes(tr);
+                return (
+                  <TouchableOpacity
+                    key={tr}
+                    style={[styles.triggerChip, active && styles.triggerChipActive]}
+                    onPress={() => {
+                      const current = attackForm.triggers || [];
+                      const next = active
+                        ? current.filter((t) => t !== tr)
+                        : [...current, tr];
+                      setAttackForm({ triggers: next });
+                    }}
+                  >
+                    <Text style={[styles.triggerChipText, active && styles.triggerChipTextActive]}>
+                      {t(`triggerLabels.${tr}`)}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
             {/* Notes */}
             <View style={styles.sectionHeader}>
               <View style={styles.sectionIcon}>
@@ -406,6 +439,28 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     marginTop: 6,
   },
+
+  // Triggers
+  triggerRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 24,
+  },
+  triggerChip: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    backgroundColor: '#F3F0EF',
+    borderWidth: 1.5,
+    borderColor: 'transparent',
+  },
+  triggerChipActive: {
+    backgroundColor: 'rgba(139,92,246,0.1)',
+    borderColor: G.indigo,
+  },
+  triggerChipText: { fontSize: 13, fontFamily: FONTS.semiBold, color: G.sub },
+  triggerChipTextActive: { color: G.indigo },
 
   // Notes
   textarea: {
